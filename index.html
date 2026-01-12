@@ -3,11 +3,12 @@
 
 <head>
     <meta charset="UTF-8" />
-    <title>Volleyball Event Registration</title>
+    <title>CEMC Volleyball Registration</title>
+    <link rel="stylesheet" href="/css/styles.css" />
 </head>
 
 <body>
-    <h1>Volleyball Event Registration</h1>
+    <h1 id="CEMC">CEMC Volleyball Registration</h1>
 
     <form id="registrationForm">
         <input name="name" placeholder="Full Name" required />
@@ -17,9 +18,12 @@
 
     <p id="message"></p>
 
+    <div id="listsContainer"></div>
+
     <script>
         const form = document.getElementById("registrationForm");
         const message = document.getElementById("message");
+        const listsContainer = document.getElementById("listsContainer");
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -37,6 +41,35 @@
 
             const result = await res.json();
             message.textContent = result.message;
+            listsContainer.innerHTML = "";
+            if (result.registered) {
+                const registeredDiv = document.createElement("div");
+                const registeredList = document.createElement("ul");
+                result.registered.forEach((user) => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = user.name + " (" + user.email + ")";
+                    registeredList.appendChild(listItem);
+                });
+                    const registeredTitle = document.createElement("h2");
+                    registeredTitle.textContent = "Registered Players";
+                    registeredDiv.appendChild(registeredTitle);
+                    registeredDiv.appendChild(registeredList);
+                    listsContainer.appendChild(registeredDiv);
+                }
+            if (result.waitlisted) {
+                const waitlistedDiv = document.createElement("div");
+                const waitlistedList = document.createElement("ul");
+                result.waitlisted.forEach((user) => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = user.name + " (" + user.email + ")";
+                    waitlistedList.appendChild(listItem);
+                });
+                const waitlistedTitle = document.createElement("h2");
+                waitlistedTitle.textContent = "Waitlisted Players";
+                waitlistedDiv.appendChild(waitlistedTitle);
+                waitlistedDiv.appendChild(waitlistedList);
+                listsContainer.appendChild(waitlistedDiv);
+            }
         });
     </script>
 </body>
