@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Volleyball Event Registration</title>
+</head>
+
+<body>
+    <h1>Volleyball Event Registration</h1>
+
+    <form id="registrationForm">
+        <input name="name" placeholder="Full Name" required />
+        <input name="email" type="email" placeholder="Email" required />
+        <button type="submit">Register</button>
+    </form>
+
+    <p id="message"></p>
+
+    <script>
+        const form = document.getElementById("registrationForm");
+        const message = document.getElementById("message");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const data = {
+                name: form.name.value,
+                email: form.email.value,
+                phone: form.phone.value,
+            };
+
+            const res = await fetch("/api/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            const result = await res.json();
+            message.textContent = result.message;
+            console.log(result);
+            console.log(message)
+        });
+    </script>
+</body>
+
+</html>
