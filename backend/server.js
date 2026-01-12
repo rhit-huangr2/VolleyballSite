@@ -9,7 +9,7 @@ app.use(express.json());
 
 
 
-const DATA_FILE = path.join(process.cwd(), "registrations.json");
+const DATA_FILE = path.join(process.cwd(), "backend/registrations.json");
 const MAX_PLAYERS = 24;
 
 // Utility: read JSON safely
@@ -33,9 +33,13 @@ app.post("/api/register", (req, res) => {
 
     const registrations = readRegistrations();
 
-    // Prevent duplicates
+    // Prevent duplicates but still return the other attendees when the email is already registered
     if (registrations.some(r => r.email === email)) {
-        return res.status(409).json({ message: "This email is already registered." });
+        const others = registrations
+            // .filter(r => r.email !== email)
+            .map(({ name, email }) => ({ name, email }));
+
+        return res.status(409).json({ message: "This email is already registered.", others });
     }
 
     // Limit players
@@ -51,12 +55,18 @@ app.post("/api/register", (req, res) => {
 
     writeRegistrations(registrations);
 
-    res.json({ message: "You are registered successfully!" });
+    // Return success plus the other registered users (exclude the newly registered one)
+    const others = registrations
+        // .filter(r => r.email !== email)
+        .map(({ name, email }) => ({ name, email }));
+
+    res.json({ message: "You are registered successfully!", others });
+    console.log(others);
 });
 
 // Health / root endpoint
 app.get("/", (req, res) => {
-    res.send("Volleyball registration server is running!!!");
+    res.sendFile(path.join(process.cwd(), "index.html"));
 });
 
 app.listen(3000, () => {

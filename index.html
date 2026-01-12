@@ -27,7 +27,6 @@
             const data = {
                 name: form.name.value,
                 email: form.email.value,
-                phone: form.phone.value,
             };
 
             const res = await fetch("/api/register", {
@@ -38,8 +37,6 @@
 
             const result = await res.json();
             message.textContent = result.message;
-            console.log(result);
-            console.log(message)
         });
     </script>
 </body>
