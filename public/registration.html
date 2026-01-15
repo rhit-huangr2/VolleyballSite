@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>CEMC Volleyball Registration</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+
+<body>
+    <h1 id="CEMC">CEMC Volleyball Registration</h1>
+
+    <form id="registrationForm">
+        <input name="name" placeholder="Full Name" required />
+        <input name="email" type="email" placeholder="Email" required />
+        <button type="submit">Register</button>
+    </form>
+
+    <p id="message"></p>
+
+    <div id="listsContainer"></div>
+
+    <button id="signOutBtn" type="button">Sign Out</button>
+
+    <!-- Firebase SDKs (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+
+    <!-- Firebase client initialization (if hosting init.js is not available) -->
+    <script>
+        try {
+            // If Firebase is already initialized by Hosting's init.js, skip.
+            if (!(window.firebase && firebase.apps && firebase.apps.length)) {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBDerlX_ooQ9iRNNXE7NmdtL-GE1EffJNA",
+                    authDomain: "cemcvolleyball.firebaseapp.com",
+                    projectId: "cemcvolleyball",
+                };
+                if (window.firebase && firebase.initializeApp) {
+                    firebase.initializeApp(firebaseConfig);
+                    console.log('Firebase initialized on registration page');
+                }
+            }
+        } catch (e) {
+            console.warn('Firebase init skipped or failed:', e && e.message);
+        }
+
+    </script>
+
+    <script>
+        if (window.firebase && firebase.auth) {
+            var currentUser = firebase.auth().currentUser;
+            if (currentUser) {
+                console.log('Current user:', {
+                    uid: currentUser.uid,
+                    email: currentUser.email,
+                    displayName: currentUser.displayName,
+                    phoneNumber: currentUser.phoneNumber,
+                    photoURL: currentUser.photoURL,
+                    emailVerified: currentUser.emailVerified
+                });
+            } else {
+                // Listen for auth state changes in case the user is not yet initialized
+                firebase.auth().onAuthStateChanged(function (user) {
+                    console.log('Auth state changed. Current user:', user ? {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName,
+                        phoneNumber: user.phoneNumber,
+                        photoURL: user.photoURL,
+                        emailVerified: user.emailVerified
+                    } : null);
+                });
+            }
+        } else {
+            console.log('Firebase Auth not detected on window. No current user available.');
+        }
+        document.getElementById('signOutBtn').addEventListener('click', function () {
+
+            console.log('Firebase sign-out button clicked.');
+            // If Firebase v8/compat is loaded as `firebase`
+            if (window.firebase && firebase.auth) {
+                firebase.auth().signOut()
+                    .then(function () { window.location = '/'; })
+                    .catch(function (err) {
+                        console.error('Firebase signOut error:', err);
+                        window.location = '/';
+                    });
+                return;
+            }
+
+            // Fallback: attempt server-side sign out
+            fetch('/signout', { method: 'POST', credentials: 'same-origin' })
+                .then(function () { window.location = '/'; })
+                .catch(function () { window.location = '/signout'; });
+        });
+    </script>
+</body>
+
+</html>
