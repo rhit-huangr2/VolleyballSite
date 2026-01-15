@@ -48,7 +48,7 @@ class LoginPageController {
 class CreateAccountController {
 	constructor() {
 		const createBtn = document.querySelector("#createAccountButton");
-		const loginBtn = document.querySelector("#LogInButton");
+		const loginBtn = document.querySelector("#logInButton");
 		const emailInput = document.querySelector("#inputEmail");
 		const passwordInput = document.querySelector("#inputPassword");
 		const displayNameInput = document.querySelector("#inputDisplayName");
@@ -94,7 +94,8 @@ class CreateAccountController {
 
 		if (loginBtn) {
 			loginBtn.onclick = () => {
-				window.location.href = "/register.html";
+				console.log("Login button clicked");
+				window.location.href = "/";
 			};
 		}
 	}
