@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+
+<body>
+    <h1>User Profile</h1>
+    <p id="status">Checking authentication...</p>
+    <p id="email"></p>
+    <button id="signOutBtn">Sign Out</button>
+
+    <!-- Load Firebase compat SDKs, then Hosting init -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="/__/firebase/init.js"></script>
+
+    <script>
+        function showSignedOut() {
+            document.getElementById('status').textContent = 'Not signed in.';
+            document.getElementById('email').textContent = '';
+            document.getElementById('signOutBtn').style.display = 'none';
+        }
+
+        if (window.firebase && firebase.auth) {
+            firebase.auth().onAuthStateChanged(function (user) {
+                if (user) {
+                    document.getElementById('status').textContent = 'Signed in as:';
+                    document.getElementById('email').textContent = user.email || '(no email)';
+                    document.getElementById('signOutBtn').style.display = 'inline-block';
+                } else {
+                    // Not signed in — send back to sign-in page
+                    showSignedOut();
+                    setTimeout(function () { window.location.href = '/'; }, 800);
+                }
+            });
+        } else {
+            document.getElementById('status').textContent = 'Firebase not initialized.';
+        }
+
+        document.getElementById('signOutBtn').addEventListener('click', function () {
+            if (window.firebase && firebase.auth) {
+                firebase.auth().signOut().then(function () {
+                    window.location.href = '/';
+                }).catch(function (err) {
+                    console.error('Sign out error', err);
+                    window.location.href = '/';
+                });
+            } else {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+
+</html>

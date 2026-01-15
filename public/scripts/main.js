@@ -1,86 +1,209 @@
-var rhit = rhit || {};
+var fbAuthManager = null;
 
 
-rhit.main = function () {
-    console.log("Ready");
-
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            const displayName = user.displayName;
-            const email = user.email;
-
-            const photoURL = user.photoURL;
-            const phoneNumber = user.phoneNumber;
-            const isAnonymous = user.isAnonymous;
-            const uid = user.uid;
-
-            console.log("the user is signed in: ", uid);
-            console.log(displayName);
-            console.log(email);
-            console.log(photoURL);
-            console.log(phoneNumber);
-            console.log(isAnonymous);
-        }
-        else {
-            console.log("no user signed in");
-        }
-    });
-
-    const inputEmailEl = document.querySelector("#inputEmail");
-    const inputPasswordEl = document.querySelector("#inputPassword");
-
-    document.querySelector("#signOutButton").onclick = (event) => {
-        console.log(`Sign out`);
-
-        firebase.auth().signOut().then(function () {
-            console.log("you are now signed out");
-        }).catch(function (error) {
-            console.log("sign out error");
-        });
-    };
-    document.querySelector("#createAccountButton").onclick = (event) => {
-        console.log(`Create account ${inputEmailEl.value} password: ${inputPasswordEl.value}`);
-        firebase.auth().createUserWithEmailAndPassword(inputEmailEl.value, inputPasswordEl.value).catch(function (error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            console.log("Create account error ", errorCode, errorMessage);
-
-        });
-    };
-    document.querySelector("#logInButton").onclick = (event) => {
-        console.log(`Log in for email: ${inputEmailEl.value} password: ${inputPasswordEl.value}`);
-        firebase.auth().signInWithEmailAndPassword(inputEmailEl.value, inputPasswordEl.value).catch(function (error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            console.log("log in error", errorCode, errorMessage);
-
-        });
-    };
-
-    document.querySelector("#anonymousAuthButton").onclick = (event) => {
-
-        firebase.auth().signInAnonymously().catch(function (error) {
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            console.log("Anonymous auth error", errorCode, errorMessage);
-        })
-    };
-    rhit.startFirebaseUI();
-
-};
-rhit.startFirebaseUI = function () {
-    var uiConfig = {
-        signInSuccessUrl: '/',
-        signInOptions: [
-            firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-            firebase.auth.EmailAuthProvider.PROVIDER_ID,
-            firebase.auth.PhoneAuthProvider.PROVIDER_ID,
-            firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID,
-        ],
-    };
-
-    const ui = new firebaseui.auth.AuthUI(firebase.auth());
-    ui.start('#firebaseui-auth-container', uiConfig);
+function htmlToElement(html) {
+	var template = document.createElement('template');
+	html = html.trim();
+	template.innerHTML = html;
+	return template.content.firstChild;
 }
 
-rhit.main();
+
+class LoginPageController {
+	constructor() {
+		// Wire up the create-account and log-in buttons to use email/password auth
+		const createBtn = document.querySelector("#createAccountButton");
+		const loginBtn = document.querySelector("#logInButton");
+		const emailInput = document.querySelector("#inputEmail");
+		const passwordInput = document.querySelector("#inputPassword");
+
+		if (createBtn) {
+			createBtn.onclick = (event) => {
+				// 	const email = emailInput && emailInput.value;
+				// 	const password = passwordInput && passwordInput.value;
+				// 	if (!email || !password) {
+				// 		alert('Please enter email and password to create an account.');
+				// 		return;
+				// 	}
+				// 	fbAuthManager.createAccount(email, password);
+				console.log("createBtn found");
+				window.location.href = "/create_account.html";
+			};
+		}
+
+		if (loginBtn) {
+			loginBtn.onclick = (event) => {
+				const email = emailInput && emailInput.value;
+				const password = passwordInput && passwordInput.value;
+				if (!email || !password) {
+					alert('Please enter email and password to sign in.');
+					return;
+				}
+				fbAuthManager.signIn(email, password);
+			};
+		}
+	}
+}
+
+class CreateAccountController {
+	constructor() {
+		const createBtn = document.querySelector("#createAccountButton");
+		const loginBtn = document.querySelector("#LogInButton");
+		const emailInput = document.querySelector("#inputEmail");
+		const passwordInput = document.querySelector("#inputPassword");
+		const displayNameInput = document.querySelector("#inputDisplayName");
+		const passwordConfirmInput = document.querySelector("#inputPasswordConfirm");
+
+		if (createBtn) {
+			createBtn.onclick = (event) => {
+				console.log("Create account clicked");
+				const email = emailInput && emailInput.value;
+				const password = passwordInput && passwordInput.value;
+				const displayName = displayNameInput && displayNameInput.value;
+				const confirm = passwordConfirmInput && passwordConfirmInput.value;
+
+				if (!email || !password || !confirm) {
+					alert('Please enter email and both password fields.');
+					return;
+				}
+
+				if (!displayName) {
+					alert('Please enter a display name.');
+					return;
+				}
+				if (password !== confirm) {
+					alert('Passwords do not match.');
+					return;
+				}
+				if (password.length < 6) {
+					alert('Password should be at least 6 characters.');
+					return;
+				}
+
+				// Create account, set displayName and create Firestore user doc, then redirect
+				fbAuthManager.createAccount(email, password, displayName)
+					.then(() => {
+						window.location.href = "/";
+					})
+					.catch((err) => {
+						console.error('Create account flow failed', err);
+						alert('Create account failed: ' + (err && err.message ? err.message : err));
+					});
+			};
+		}
+
+		if (loginBtn) {
+			loginBtn.onclick = () => {
+				window.location.href = "/register.html";
+			};
+		}
+	}
+}
+
+class FbAuthManager {
+	constructor() {
+		this._user = null;
+	}
+	beginListening(changeListener) {
+		firebase.auth().onAuthStateChanged((user) => {
+			this._user = user;
+			changeListener();
+			
+		});
+	}
+	// Sign in using email & password
+	signIn(email, password) {
+		firebase.auth().signInWithEmailAndPassword(email, password)
+			.catch((error) => {
+				console.error('Sign-in error', error.code, error.message);
+				alert('Sign-in failed: ' + error.message);
+			});
+	}
+
+	// Create a new account using email & password and set display name
+	createAccount(email, password, displayName) {
+		// Return a promise that resolves when account creation, profile update,
+		// and Firestore user doc creation have completed.
+		return firebase.auth().createUserWithEmailAndPassword(email, password)
+			.then((userCredential) => {
+				const user = userCredential.user;
+				// Update display name if provided
+				let p = Promise.resolve();
+				if (user && displayName) {
+					p = user.updateProfile({ displayName: displayName });
+				}
+				return p.then(() => {
+					// Create Users collection document if it doesn't exist
+					if (user && window.firebase && firebase.firestore) {
+						const db = firebase.firestore();
+						const userRef = db.collection('Users').doc(user.uid);
+						return userRef.get().then((snap) => {
+							if (!snap.exists) {
+								return userRef.set({
+									name: displayName || "",
+									email: user.email || "",
+									rating: 5,
+									createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+								});
+							}
+							return null;
+						});
+					}
+					return null;
+				});
+			})
+			.catch((error) => {
+				console.error('Create account error', error.code, error.message);
+				throw error;
+			});
+	}
+	signOut() {
+		firebase.auth().signOut().catch((error) => {
+			console.log("sign out error");
+		});
+	}
+	get isSignedIn() {
+		return !!this._user;
+	}
+	get uid() {
+		return this._user.uid
+	}
+}
+
+function checkForRedirects() {
+	if (document.querySelector("#loginPage") && fbAuthManager.isSignedIn) {
+		window.location.href = "/register.html";
+	}
+
+	if (!document.querySelector("#loginPage") && !document.querySelector("#createAccountPage") && !fbAuthManager.isSignedIn) {
+		window.location.href = "/";
+	}
+
+};
+
+function initializePage() {
+	const urlParams = new URLSearchParams(window.location.search);
+	if (document.querySelector("#loginPage")) {
+		console.log("you are on the login page.");
+		new LoginPageController();
+	}
+	if (document.querySelector("#createAccountPage")) {
+		console.log("you are on the create account page.");
+		new CreateAccountController();
+	}
+}
+
+/* Main */
+function main() {
+	console.log("Ready");
+	fbAuthManager = new FbAuthManager();
+	fbAuthManager.beginListening(() => {
+		console.log("isSignedIn = ", fbAuthManager.isSignedIn);
+
+		checkForRedirects();
+
+		initializePage();
+	});
+}
+
+main();
