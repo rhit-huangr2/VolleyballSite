@@ -1,8 +1,0 @@
-#listsContainer {
-    display: flex;
-    columns: 2;
-}
-
-#listsContainer div {
-    margin-right: 10%; /* Optional: Adds spacing between the divs */
-}
