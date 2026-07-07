@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 24px;
+    background: #f7f7f7;
+}
+
+.app {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    padding: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.reg-form input {
+    margin-right: 8px;
+    padding: 6px 8px;
+}
+
+.lists-container {
+    display: flex;
+    gap: 24px;
+    margin-top: 12px;
+}
+
+.list-column {
+    flex: 1;
+    min-width: 200px;
+}
+
+.list-column h2 {
+    margin: 0 0 8px 0;
+}
+
+.list-column ul {
+    list-style: none;
+    padding: 8px;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fafafa;
+    min-height: 40px;
+}
+
+.list-column li {
+    padding: 6px 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.list-column li:last-child {
+    border-bottom: none;
+}
