@@ -45,7 +45,7 @@ function App() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -150,23 +150,62 @@ function App() {
     );
   }
 
+  function renderButtons(){
+    return (
+      <>
+        <div className="view-toggle" role="tablist" aria-label="Authentication views">
+          <button
+            type="button"
+            className={activeView === 'signin' ? 'view-toggle-button active' : 'view-toggle-button'}
+            onClick={() => {
+              setStatus('');
+              setActiveView('signin');
+              setSignedInUser(null);
+              setFormData({ fullName: '', email: '', password: '' });
+            }}
+            role="tab"
+            aria-selected={activeView === 'signin'}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            className={activeView === 'signup' ? 'view-toggle-button active' : 'view-toggle-button'}
+            onClick={() => {
+              setStatus('');
+              setActiveView('signup');
+              setSignedInUser(null);
+              setFormData({ fullName: '', email: '', password: '' });
+            }}
+            role="tab"
+            aria-selected={activeView === 'signup'}
+            >
+            Sign Up
+          </button>
+        </div>
+      </>
+    )
+  }
   function renderForm() {
     if (activeView === 'dashboard') {
       return (
         <SignedInListsPage
-          signedInUser={signedInUser}
-          playerLists={playerLists}
-          status={status}
-          onSignUp={handleSignUpFromDashboard}
-          onSignOut={handleSignOut}
+        signedInUser={signedInUser}
+        playerLists={playerLists}
+        status={status}
+        onSignUp={handleSignUpFromDashboard}
+        onSignOut={handleSignOut}
         />
       );
     }
-
+    
+    
     if (activeView === 'signin') {
       return (
         <section className="form-panel" aria-label="Account sign in form">
+          
           <div className="form-card">
+            {renderButtons()}
             <h2>Sign In</h2>
             <p className="form-intro">Enter your email and password to continue.</p>
 
@@ -215,6 +254,7 @@ function App() {
     return (
       <section className="form-panel" aria-label="Account registration form">
         <div className="form-card">
+          {renderButtons()}
           <h2>Create Account</h2>
           <p className="form-intro">Enter your full name, email, and password to get started.</p>
 
@@ -279,7 +319,7 @@ function App() {
         <section className="hero-panel">
           {renderHeroCopy()}
 
-          <div className="view-toggle" role="tablist" aria-label="Authentication views">
+          {/* <div className="view-toggle" role="tablist" aria-label="Authentication views">
             <button
               type="button"
               className={activeView === 'signin' ? 'view-toggle-button active' : 'view-toggle-button'}
@@ -308,8 +348,9 @@ function App() {
             >
               Sign Up
             </button>
-          </div>
+          </div> */}
         </section>
+        {/* {renderButtons()} */}
 
         {renderForm()}
       </main>

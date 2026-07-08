@@ -64,7 +64,38 @@ const server = http.createServer(async (request, response) => {
 		return;
 	}
 
-	if (request.url === '/api/register' && request.method === 'POST') {
+    if (request.url === '/api/lists' && request.method === 'POST') {
+        try {
+            const body = await readRequestBody(request);
+            const name = String(body.name || '').trim();
+            const email = String(body.email || '').trim();
+            const password = String(body.password || '');
+            const rating = Number(body.rating || 0);
+
+            const lists = await readLists();
+            const placementListName = lists['registered-users'].length >= 24 ? 'waitlist-users' : 'registered-users';
+            const duplicateEmail = lists['registered-users'].find((player) => player.email === email) || lists['waitlist-users'].find((player) => player.email === email);
+
+            if (duplicateEmail) {
+                sendJson(response, 409, {
+                    error: 'You are already registered.'
+                });
+                return;
+            }
+            await createListEntry(placementListName, { name, email, password, rating });
+
+            // await createListEntry(listName, { email: userEmail });
+            sendJson(response, 201, { message: 'List entry created successfully.' });
+        } catch (error) {
+            sendJson(response, 500, {
+                error: 'Unable to create list entry.'
+            });
+        }
+
+        return;
+    }
+
+	if (request.url === '/api/signup' && request.method === 'POST') {
 		try {
 			const body = await readRequestBody(request);
 			const name = String(body.name || '').trim();
@@ -88,16 +119,12 @@ const server = http.createServer(async (request, response) => {
 				return;
 			}
 
-			const lists = await readLists();
-			const placementListName = lists['registered-users'].length >= 24 ? 'waitlist-users' : 'registered-users';
 
 			const user = await createUser({ name, email, password });
-			await createListEntry(placementListName, user);
 
 			sendJson(response, 201, {
 				message: 'Account created successfully.',
 				user,
-				placement: placementListName
 			});
 		} catch (error) {
 			sendJson(response, 400, {

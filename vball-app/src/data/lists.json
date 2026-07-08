@@ -11,6 +11,12 @@
       "email": "ava.patel@example.com",
       "password": "test",
       "rating": 4
+    },
+    {
+      "name": "test",
+      "email": "test@test.com",
+      "password": "test",
+      "rating": -1
     }
   ],
   "waitlist-users": [
