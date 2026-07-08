@@ -65,6 +65,7 @@ const server = http.createServer(async (request, response) => {
 	}
 
     if (request.url === '/api/lists' && request.method === 'POST') {
+        console.log('Received POST request to /api/lists'); // Debugging log
         try {
             const body = await readRequestBody(request);
             const name = String(body.name || '').trim();
@@ -84,7 +85,6 @@ const server = http.createServer(async (request, response) => {
             }
             await createListEntry(placementListName, { name, email, password, rating });
 
-            // await createListEntry(listName, { email: userEmail });
             sendJson(response, 201, { message: 'List entry created successfully.' });
         } catch (error) {
             sendJson(response, 500, {
