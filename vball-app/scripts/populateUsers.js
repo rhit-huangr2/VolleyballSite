@@ -1,37 +1,5 @@
 const { writeUsers } = require('../src/jsonCrud');
-
-const seededUsers = [
-	{
-		name: 'Ryan Huang',
-		email: 'ryan.huang@example.com',
-		password: 'test',
-		rating: 5
-	},
-	{
-		name: 'Ava Patel',
-		email: 'ava.patel@example.com',
-		password: 'test',
-		rating: 4
-	},
-	{
-		name: 'Jordan Lee',
-		email: 'jordan.lee@example.com',
-		password: 'test',
-		rating: 3
-	},
-	{
-		name: 'Mia Chen',
-		email: 'mia.chen@example.com',
-		password: 'test',
-		rating: 5
-	},
-	{
-		name: 'Noah Wilson',
-		email: 'noah.wilson@example.com',
-		password: 'test',
-		rating: 2
-	}
-];
+const { registeredUsers: seededUsers } = require('./seedUsers');
 
 async function populateUsers() {
 	await writeUsers(seededUsers);

@@ -12,16 +12,21 @@
   min-height: calc(100vh - 64px);
   display: grid;
   /* grid-template-columns: 1.05fr 0.95fr; */
+  margin-top: 50px;
   gap: 12px;
   align-items: center;
   max-width: 1180px;
-  margin: 0 auto;
+  /* margin: 0 auto; */
 }
 
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.dashboard-info {
+  margin-top: 50px;
 }
 
 .feature-label {
@@ -44,14 +49,19 @@
 }
 
 .hero-panel {
-  padding: 24px 8px;
+  padding: 0px 8px;
+  position: absolute;
+  top: 5%;
 }
 
 .list-card {
   padding: 20px;
+  height: 450px;
   border: 1px solid #cbd5e1;
   border-radius: 22px;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  overflow-y: scroll;
+
 }
 
 .list-card-header h3 {
@@ -140,7 +150,7 @@
 .form-panel {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   
 }

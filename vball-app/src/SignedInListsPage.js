@@ -24,6 +24,7 @@ function SignedInListsPage({
             });
 
             const result = await response.json();
+            window.location.reload(); // Refresh the page to show updated lists
         } catch (error) {
             // setStatus(error.message);
         } finally {
@@ -81,7 +82,7 @@ function SignedInListsPage({
             <button type="button" className="signout-button view-toggle-button active" onClick={onSignOut}>
                 Sign out
             </button>
-            <div>
+            <div className="dashboard-info">
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
             </div>
             {RenderDashboard()}
