@@ -1,7 +1,7 @@
 const fs = require('fs/promises');
 const path = require('path');
 
-const dataDir = path.join(__dirname, 'data');
+const dataDir = __dirname;
 const usersFilePath = path.join(dataDir, 'users.json');
 const listsFilePath = path.join(dataDir, 'lists.json');
 

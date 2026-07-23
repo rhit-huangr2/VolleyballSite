@@ -3,12 +3,19 @@ function SignedInListsPage({
 	playerLists,
 	status,
 	onRegisterPlayer,
-	onSignOut
+	onSignOut,
+    isRegistered,
+    checkRegistration,
+    setIsRegistered
 }) {
+
+    checkRegistration(); // Call the function to check registration status
+    console.log('Is Registered:', isRegistered); // Debugging log
+
     async function handleRegister(event) {
         event.preventDefault();
         console.log('handleRegister called with signedInUser:', signedInUser); // Debugging log
-
+        console.log('Is Registered:', isRegistered); // Debugging log
         try {
             const response = await fetch('/api/lists', {
                 method: 'POST',
@@ -24,14 +31,45 @@ function SignedInListsPage({
             });
 
             const result = await response.json();
-            window.location.reload(); // Refresh the page to show updated lists
+
+            if (response.ok) {
+                window.location.reload(); // Refresh the page to show updated lists
+            }
+            else {
+                alert('Error registering player: ' + (result.error || 'Unknown error'));
+            }
         } catch (error) {
             // setStatus(error.message);
         } finally {
             // setIsSubmitting(false);
         }
     }
-    
+
+    async function handleWithdraw(event) {
+        event.preventDefault();
+        console.log('handleWithdraw called with signedInUser:', signedInUser); // Debugging log
+        try {
+            const response = await fetch('/api/withdraw', {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Unable to withdraw.');
+            }
+
+            console.log(data.message);
+
+            // Update the UI after successful withdrawal
+            setIsRegistered(false);
+            window.location.reload(); // Refresh the page to show updated lists
+
+        } catch (error) {
+            console.error('Withdrawal error:', error);
+        }
+    }
+
 	function renderPlayerList(title, players) {
 		return (
 			<section className="list-card">
@@ -68,10 +106,23 @@ function SignedInListsPage({
                     { renderPlayerList('Waitlisted players', playerLists.waitlistUsers) }
                 </div >
                 <div className="dashboard-actions">
-                    <button type="button" className="register-button view-toggle-button active" onClick={handleRegister}>
-                        Register
-                    </button>
-                    
+                    {isRegistered ? (
+                        <button
+                            type="button"
+                            className="register-button view-toggle-button active"
+                            onClick={handleWithdraw}
+                        >
+                            Withdraw
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            className="register-button view-toggle-button active"
+                            onClick={handleRegister}
+                        >
+                            Register
+                        </button>
+                    )}
                 </div>
             </div>
         );

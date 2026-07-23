@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SignedInListsPage from './SignedInListsPage';
 import './App.css';
 
@@ -16,14 +16,7 @@ function App() {
   });
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  function handleChange(event) {
-    const { name, value } = event.target;
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value
-    }));
-  }
+  const [isRegistered, setIsRegistered] = useState(false);
 
   async function refreshPlayerLists() {
     const response = await fetch('/api/lists');
@@ -37,6 +30,36 @@ function App() {
       registeredUsers: result['registered-users'],
       waitlistUsers: result['waitlist-users']
     });
+  }
+
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const response = await fetch('/api/me');
+
+        if (!response.ok) {
+          return;
+        }
+
+        const result = await response.json();
+
+        setSignedInUser(result.user);
+        await refreshPlayerLists();
+        setActiveView('dashboard');
+      } catch (error) {
+        console.error('Session check failed:', error);
+      }
+    }
+
+    checkSession();
+  }, []);
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setFormData((currentData) => ({
+      ...currentData,
+      [name]: value
+    }));
   }
 
   async function handleSubmit(event) {
@@ -130,7 +153,16 @@ function App() {
     setFormData({ fullName: '', email: '', password: '' });
   }
 
-  function handleSignOut() {
+  async function handleSignOut() {
+    try {
+      console.log('Signing out user:', signedInUser); // Debugging log
+      await fetch('/api/signout', {
+        method: 'POST'
+      });
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    }
+
     setStatus('');
     setSignedInUser(null);
     setPlayerLists({
@@ -138,7 +170,23 @@ function App() {
       waitlistUsers: []
     });
     setActiveView('signin');
-    setFormData({ fullName: '', email: '', password: '' });
+    setFormData({
+      fullName: '',
+      email: '',
+      password: ''
+    });
+  }
+
+  async function checkRegistration() {
+    try {
+      const response = await fetch('/api/registration-status');
+
+      const data = await response.json();
+
+      setIsRegistered(data.isRegistered);
+    } catch (error) {
+      console.error('Error checking registration status:', error);
+    }
   }
 
   function renderHeroCopy() {
@@ -195,6 +243,9 @@ function App() {
         status={status}
         onSignUp={handleSignUpFromDashboard}
         onSignOut={handleSignOut}
+        isRegistered={isRegistered}
+        checkRegistration={checkRegistration}
+        setIsRegistered={setIsRegistered}
         />
       );
     }

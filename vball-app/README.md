@@ -1,3 +1,9 @@
+# IDEAS TO ADD
+- Basketball signups
+- rating system
+- guests
+- fix components so sign in page doesnt come back every refresh
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

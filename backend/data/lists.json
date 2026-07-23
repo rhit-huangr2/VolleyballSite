@@ -139,16 +139,22 @@
       "rating": 5
     },
     {
-      "name": "Michael Perry",
-      "email": "michael.perry@example.com",
+      "name": "test",
+      "email": "test@test.com",
       "password": "test",
-      "rating": 3
+      "rating": 0
     }
   ],
   "waitlist-users": [
     {
-      "name": "test",
-      "email": "test@test.com",
+      "name": "test2",
+      "email": "test2@test.com",
+      "password": "test",
+      "rating": 0
+    },
+    {
+      "name": "test3",
+      "email": "test3@test.com",
       "password": "test",
       "rating": 0
     }

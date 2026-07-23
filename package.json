@@ -1,0 +1,25 @@
+{
+  "name": "volleyballsite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node scripts/dev.js",
+    "populate": "node scripts/populate.js",
+    "populate:all": "node scripts/populate.js all",
+    "populate:users": "node scripts/populate.js users",
+    "populate:lists": "node scripts/populate.js lists"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rhit-huangr2/VolleyballSite.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rhit-huangr2/VolleyballSite/issues"
+  },
+  "homepage": "https://github.com/rhit-huangr2/VolleyballSite#readme"
+}

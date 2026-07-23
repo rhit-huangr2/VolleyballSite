@@ -148,6 +148,16 @@
       "name": "test",
       "email": "test@test.com",
       "password": "test"
+    },
+    {
+      "name": "test2",
+      "email": "test2@test.com",
+      "password": "test"
+    },
+    {
+      "name": "test3",
+      "email": "test3@test.com",
+      "password": "test"
     }
   ]
 }
