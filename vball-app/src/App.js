@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import SignedInListsPage from './SignedInListsPage';
 import './App.css';
+import AuthForm from './Components/AuthForm';
+
 
 function App() {
   const [activeView, setActiveView] = useState('signin');
@@ -17,6 +19,7 @@ function App() {
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
   async function refreshPlayerLists() {
     const response = await fetch('/api/lists');
@@ -48,6 +51,8 @@ function App() {
         setActiveView('dashboard');
       } catch (error) {
         console.error('Session check failed:', error);
+      } finally {
+        setIsCheckingSession(false);
       }
     }
 
@@ -238,130 +243,37 @@ function App() {
     if (activeView === 'dashboard') {
       return (
         <SignedInListsPage
-        signedInUser={signedInUser}
-        playerLists={playerLists}
-        status={status}
-        onSignUp={handleSignUpFromDashboard}
-        onSignOut={handleSignOut}
-        isRegistered={isRegistered}
-        checkRegistration={checkRegistration}
-        setIsRegistered={setIsRegistered}
+          signedInUser={signedInUser}
+          playerLists={playerLists}
+          status={status}
+          onSignUp={handleSignUpFromDashboard}
+          onSignOut={handleSignOut}
+          isRegistered={isRegistered}
+          checkRegistration={checkRegistration}
+          setIsRegistered={setIsRegistered}
         />
-      );
-    }
-    
-    
-    if (activeView === 'signin') {
-      return (
-        <section className="form-panel" aria-label="Account sign in form">
-          
-          <div className="form-card">
-            {renderButtons()}
-            <h2>Sign In</h2>
-            <p className="form-intro">Enter your email and password to continue.</p>
-
-            <form onSubmit={handleSignInSubmit} className="registration-form">
-              <label>
-                Email address
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  required
-                />
-              </label>
-
-              <label>
-                Password
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Enter your password"
-                  autoComplete="current-password"
-                  required
-                />
-              </label>
-
-              <button type="submit" className="primary-button" disabled={isSubmitting}>
-                {isSubmitting ? 'Signing in...' : 'Sign In'}
-              </button>
-
-              {status ? (
-                <p className="status-message" aria-live="polite">
-                  {status}
-                </p>
-              ) : null}
-            </form>
-          </div>
-        </section>
       );
     }
 
     return (
-      <section className="form-panel" aria-label="Account registration form">
-        <div className="form-card">
-          {renderButtons()}
-          <h2>Create Account</h2>
-          <p className="form-intro">Enter your full name, email, and password to get started.</p>
-
-          <form onSubmit={handleSubmit} className="registration-form">
-            <label>
-              Full name
-              <input
-                type="text"
-                name="fullName"
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder="Jordan Smith"
-                autoComplete="name"
-                required
-              />
-            </label>
-
-            <label>
-              Email address
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                autoComplete="email"
-                required
-              />
-            </label>
-
-            <label>
-              Password
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Create a password"
-                autoComplete="new-password"
-                required
-              />
-            </label>
-
-            <button type="submit" className="primary-button" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating account...' : 'Create account'}
-            </button>
-
-            {status ? (
-              <p className="status-message" aria-live="polite">
-                {status}
-              </p>
-            ) : null}
-          </form>
-        </div>
-      </section>
+      <AuthForm
+        activeView={activeView}
+        formData={formData}
+        status={status}
+        isSubmitting={isSubmitting}
+        onChange={handleChange}
+        onSubmit={
+          activeView === 'signin'
+            ? handleSignInSubmit
+            : handleSubmit
+        }
+        renderButtons={renderButtons}
+      />
     );
+  }
+
+  if (isCheckingSession) {
+    return null;
   }
 
   return (
@@ -369,39 +281,7 @@ function App() {
       <main className="registration-layout">
         <section className="hero-panel">
           {renderHeroCopy()}
-
-          {/* <div className="view-toggle" role="tablist" aria-label="Authentication views">
-            <button
-              type="button"
-              className={activeView === 'signin' ? 'view-toggle-button active' : 'view-toggle-button'}
-              onClick={() => {
-                setStatus('');
-                setActiveView('signin');
-                setSignedInUser(null);
-                setFormData({ fullName: '', email: '', password: '' });
-              }}
-              role="tab"
-              aria-selected={activeView === 'signin'}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              className={activeView === 'signup' ? 'view-toggle-button active' : 'view-toggle-button'}
-              onClick={() => {
-                setStatus('');
-                setActiveView('signup');
-                setSignedInUser(null);
-                setFormData({ fullName: '', email: '', password: '' });
-              }}
-              role="tab"
-              aria-selected={activeView === 'signup'}
-            >
-              Sign Up
-            </button>
-          </div> */}
         </section>
-        {/* {renderButtons()} */}
 
         {renderForm()}
       </main>

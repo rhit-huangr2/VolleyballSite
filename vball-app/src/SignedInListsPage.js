@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from 'react';
+import GuestRegistrationModal from './Components/GuestRegistrationModal';
+
 function SignedInListsPage({
 	signedInUser,
 	playerLists,
@@ -9,7 +12,12 @@ function SignedInListsPage({
     setIsRegistered
 }) {
 
-    checkRegistration(); // Call the function to check registration status
+    const [showGuestModal, setShowGuestModal] = useState(false);
+
+    useEffect(() => {
+        checkRegistration();
+    }, []);
+    // checkRegistration(); // Call the function to check registration status
     console.log('Is Registered:', isRegistered); // Debugging log
 
     async function handleRegister(event) {
@@ -123,6 +131,20 @@ function SignedInListsPage({
                             Register
                         </button>
                     )}
+                    <button
+                        type="button"
+                        className="register-button view-toggle-button active"
+                        onClick={() => setShowGuestModal(true)}
+                        
+                    >
+                        Guest Registration
+                    </button>
+
+                    {showGuestModal && (
+                        <GuestRegistrationModal
+                            onClose={() => setShowGuestModal(false)}
+                        />
+                    )}
                 </div>
             </div>
         );
@@ -137,6 +159,7 @@ function SignedInListsPage({
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
             </div>
             {RenderDashboard()}
+            
         </div>
 	);
     
