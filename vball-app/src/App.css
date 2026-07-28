@@ -153,11 +153,14 @@
   color: rgba(248, 250, 252, 0.8);
 }
 
-.signout-button {
+.button-panel {
   position: absolute;
   top: 0;
   right: 0;
   margin: 20px;
+
+  display: flex;
+  gap: 20px;
 }
 
 .register-button {

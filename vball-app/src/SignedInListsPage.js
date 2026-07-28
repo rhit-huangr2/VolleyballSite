@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import GuestRegistrationModal from './Components/GuestRegistrationModal';
+import AdminMenu from './Components/AdminMenu';
 
 function SignedInListsPage({
 	signedInUser,
@@ -13,17 +14,18 @@ function SignedInListsPage({
 }) {
 
     const [showGuestModal, setShowGuestModal] = useState(false);
+    const [showAdminMenu, setShowAdminMenu] = useState(false);
 
     useEffect(() => {
         checkRegistration();
     }, []);
     // checkRegistration(); // Call the function to check registration status
-    console.log('Is Registered:', isRegistered); // Debugging log
+    // console.log('Is Registered:', isRegistered); // Debugging log
 
     async function handleRegister(event) {
         event.preventDefault();
         console.log('handleRegister called with signedInUser:', signedInUser); // Debugging log
-        console.log('Is Registered:', isRegistered); // Debugging log
+        // console.log('Is Registered:', isRegistered); // Debugging log
         try {
             const response = await fetch('/api/lists', {
                 method: 'POST',
@@ -150,14 +152,29 @@ function SignedInListsPage({
         );
     }
 
+    function renderAdminMenu() {
+        console.log('Admin menu button clicked');
+        setShowAdminMenu(true);
+    }
+
 	return (
         <div>
-            <button type="button" className="signout-button view-toggle-button active" onClick={onSignOut}>
-                Sign out
-            </button>
+            <div className="button-panel">
+                {signedInUser?.role === 'admin' && (
+                    <button type="button" className="admin-button view-toggle-button active" onClick={renderAdminMenu}>
+                        Admin Menu
+                    </button>
+                )}
+                <button type="button" className="signout-button view-toggle-button active" onClick={onSignOut}>
+                    Sign out
+                </button>
+            </div>
             <div className="dashboard-info">
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
             </div>
+            {showAdminMenu && (
+                <AdminMenu />
+            )}
             {RenderDashboard()}
             
         </div>

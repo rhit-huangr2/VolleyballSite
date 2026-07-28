@@ -1,163 +1,207 @@
 {
   "users": [
     {
+      "name": "admin",
+      "email": "admin@admin.com",
+      "password": "admin",
+      "rating": -1,
+      "role": "admin"
+    },
+    {
       "name": "Ryan Huang",
       "email": "ryan.huang@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "Ava Patel",
       "email": "ava.patel@example.com",
       "password": "test",
-      "rating": 4
+      "rating": 4,
+      "role": "member"
     },
     {
       "name": "Jordan Lee",
       "email": "jordan.lee@example.com",
       "password": "test",
-      "rating": 3
+      "rating": 3,
+      "role": "member"
     },
     {
       "name": "Mia Chen",
       "email": "mia.chen@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "Noah Wilson",
       "email": "noah.wilson@example.com",
       "password": "test",
-      "rating": 2
+      "rating": 2,
+      "role": "member"
     },
     {
       "name": "Ethan Brooks",
       "email": "ethan.brooks@example.com",
       "password": "test",
-      "rating": 4
+      "rating": 4,
+      "role": "member"
     },
     {
       "name": "Sophia Kim",
       "email": "sophia.kim@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "Liam Carter",
       "email": "liam.carter@example.com",
       "password": "test",
-      "rating": 3
+      "rating": 3,
+      "role": "member"
     },
     {
       "name": "Isabella Nguyen",
       "email": "isabella.nguyen@example.com",
       "password": "test",
-      "rating": 4
+      "rating": 4,
+      "role": "member"
     },
     {
       "name": "Mason Rivera",
       "email": "mason.rivera@example.com",
       "password": "test",
-      "rating": 2
+      "rating": 2,
+      "role": "member"
     },
     {
       "name": "Olivia Torres",
       "email": "olivia.torres@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "Lucas Bennett",
       "email": "lucas.bennett@example.com",
       "password": "test",
-      "rating": 3
+      "rating": 3,
+      "role": "member"
     },
     {
       "name": "Amelia Foster",
       "email": "amelia.foster@example.com",
       "password": "test",
-      "rating": 4
+      "rating": 4,
+      "role": "member"
     },
     {
       "name": "Benjamin Price",
       "email": "benjamin.price@example.com",
       "password": "test",
-      "rating": 2
+      "rating": 2,
+      "role": "member"
     },
     {
       "name": "Charlotte Gray",
       "email": "charlotte.gray@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "Henry Long",
       "email": "henry.long@example.com",
       "password": "test",
-      "rating": 3
+      "rating": 3,
+      "role": "member"
     },
     {
       "name": "Harper James",
       "email": "harper.james@example.com",
       "password": "test",
-      "rating": 4
+      "rating": 4,
+      "role": "member"
     },
     {
       "name": "Elijah Reed",
       "email": "elijah.reed@example.com",
       "password": "test",
-      "rating": 2
+      "rating": 2,
+      "role": "member"
     },
     {
       "name": "Evelyn Ward",
       "email": "evelyn.ward@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "James Cooper",
       "email": "james.cooper@example.com",
       "password": "test",
-      "rating": 3
+      "rating": 3,
+      "role": "member"
     },
     {
       "name": "Abigail Cox",
       "email": "abigail.cox@example.com",
       "password": "test",
-      "rating": 4
+      "rating": 4,
+      "role": "member"
     },
     {
       "name": "Alexander Diaz",
       "email": "alexander.diaz@example.com",
       "password": "test",
-      "rating": 2
+      "rating": 2,
+      "role": "member"
     },
     {
       "name": "Emily Powell",
       "email": "emily.powell@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "role": "member"
     },
     {
       "name": "Michael Perry",
       "email": "michael.perry@example.com",
       "password": "test",
-      "rating": 3
+      "rating": 3,
+      "role": "member"
     },
     {
       "name": "test",
       "email": "test@test.com",
-      "password": "test"
+      "password": "test",
+      "rating": -1,
+      "role": "admin"
     },
     {
       "name": "test2",
       "email": "test2@test.com",
-      "password": "test"
+      "password": "test",
+      "rating": -1,
+      "role": "member"
     },
     {
       "name": "test3",
       "email": "test3@test.com",
-      "password": "test"
+      "password": "test",
+      "rating": -1,
+      "role": "member"
+    },
+    {
+      "name": "test4",
+      "email": "test4@test.com",
+      "password": "test",
+      "rating": -1,
+      "role": "member"
     }
   ]
 }

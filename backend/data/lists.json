@@ -142,7 +142,7 @@
       "name": "test2",
       "email": "test2@test.com",
       "password": "test",
-      "rating": 0
+      "rating": -1
     }
   ],
   "waitlist-users": [
@@ -150,13 +150,19 @@
       "name": "test3",
       "email": "test3@test.com",
       "password": "test",
-      "rating": 0
+      "rating": -1
     },
     {
       "name": "test",
       "email": "test@test.com",
       "password": "test",
-      "rating": 0
+      "rating": -1
+    },
+    {
+      "name": "test4",
+      "email": "test4@test.com",
+      "password": "test",
+      "rating": -1
     }
   ]
 }

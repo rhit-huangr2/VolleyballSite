@@ -73,6 +73,104 @@ const server = http.createServer(async (request, response) => {
 		return;
 	}
 
+	if (request.url === '/api/admin/users' && request.method === 'GET') {
+		try {
+			const users = await readUsers();
+
+			sendJson(response, 200, users);
+		} catch (error) {
+			sendJson(response, 500, {
+				error: 'Unable to load users.'
+			});
+		}
+
+		return;
+	}
+	if (request.url.startsWith('/api/admin/users/') && request.method === 'PUT') {
+		try {
+			const email = decodeURIComponent(
+				request.url.split('/api/admin/users/')[1]
+			);
+
+			const updates = await readRequestBody(request);
+
+			console.log("updates:", updates);
+
+			const data = await readUsers();
+			// console.log("users:", data);
+			const user = data.find(
+				u => u.email === email
+			);
+
+			if (!user) {
+				sendJson(response, 404, {
+					error: "User not found"
+				});
+				return;
+			}
+
+			Object.assign(user, updates);
+
+			await writeUsers(data);
+
+			sendJson(response, 200, {
+				message: "User updated",
+				user
+			});
+
+		} catch (error) {
+			console.error(error);
+
+			sendJson(response, 500, {
+				error: "Failed to update user"
+			});
+		}
+
+		return;
+	}
+
+	// if (
+	// 	request.url.startsWith('/api/admin/users/') &&
+	// 	request.method === 'PUT'
+	// ) {
+	// 	try {
+	// 		const email = decodeURIComponent(
+	// 			request.url.split('/').pop()
+	// 		);
+
+	// 		const body = await readRequestBody(request);
+
+	// 		const users = await readUsers();
+
+	// 		const userIndex = users.findIndex(
+	// 			user => user.email === email
+	// 		);
+
+	// 		if (userIndex === -1) {
+	// 			sendJson(response, 404, {
+	// 				error: 'User not found.'
+	// 			});
+	// 			return;
+	// 		}
+
+	// 		users[userIndex] = {
+	// 			...users[userIndex],
+	// 			...body
+	// 		};
+
+	// 		await saveUsers(users);
+
+	// 		sendJson(response, 200, users[userIndex]);
+
+	// 	} catch (error) {
+	// 		sendJson(response, 500, {
+	// 			error: 'Unable to update user.'
+	// 		});
+	// 	}
+
+	// 	return;
+	// }
+
 	if (request.url === '/api/health' && request.method === 'GET') {
 		sendJson(response, 200, { ok: true });
 		return;
@@ -97,7 +195,7 @@ const server = http.createServer(async (request, response) => {
             const name = String(body.name || '').trim();
             const email = String(body.email || '').trim();
             const password = String(body.password || '');
-            const rating = Number(body.rating || 0);
+            const rating = Number(body.rating || -1);
 
             const lists = await readLists();
             const placementListName = lists['registered-users'].length >= 24 ? 'waitlist-users' : 'registered-users';
@@ -127,6 +225,8 @@ const server = http.createServer(async (request, response) => {
 			const name = String(body.name || '').trim();
 			const email = String(body.email || '').trim();
 			const password = String(body.password || '');
+			const rating = -1; // Default rating for new users
+			const role = 'member'; // Default role for new users
 
 			if (!name || !email || !password) {
 				sendJson(response, 400, {
@@ -146,7 +246,7 @@ const server = http.createServer(async (request, response) => {
 			}
 
 
-			const user = await createUser({ name, email, password });
+			const user = await createUser({ name, email, password, rating });
 
 			sendJson(response, 201, {
 				message: 'Account created successfully.',
