@@ -1,0 +1,10 @@
+{
+    "guests": [
+        {
+            "name": "Joshua Choc",
+            "email": "joshua.choc@example.com",
+            "guestOf": "ryan.huang@example.com",
+            "experienceLevel": 2
+        }
+    ]
+}

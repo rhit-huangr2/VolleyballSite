@@ -80,33 +80,60 @@ function SignedInListsPage({
         }
     }
 
-	function renderPlayerList(title, players) {
-		return (
-			<section className="list-card">
-				<div className="list-card-header">
-					<div>
-						<h3>{title}</h3>
-						<p>{players.length} player{players.length === 1 ? '' : 's'}</p>
-						</div>
-					</div>
+    function renderPlayerList(title, players) {
+        return (
+            <section className="list-card">
 
-				{players.length ? (
-					<ul className="player-list">
-						{players.map((player) => (
-							<li key={player.email} className="player-list-item">
-								<div>
-									<strong>{player.name}</strong>
-									<span>{player.email}</span>
-								</div>
-							</li>
-						))}
-					</ul>
-				) : (
-					<p className="empty-state">No players yet.</p>
-				)}
-			</section>
-		);
-	}
+                <div className="list-card-header">
+                    <div>
+                        <h3>{title}</h3>
+
+                        <p>
+                            {players.length} player
+                            {players.length === 1 ? '' : 's'}
+                        </p>
+                    </div>
+                </div>
+
+                {players.length ? (
+                    <ul className="player-list">
+
+                        {players.map((player) => {
+                            const isGuest = player.guestOf !== undefined;
+
+                            return (
+                                <li
+                                    key={player.email}
+                                    className={
+                                        isGuest
+                                            ? "player-list-item guest-item"
+                                            : "player-list-item"
+                                        }
+                                >
+                                    <div>
+                                        <strong>
+                                            {player.name}
+                                            {isGuest && " (Guest of " + player.guestOf + ")"}
+                                        </strong>
+
+                                        <span>
+                                            {player.email}
+                                        </span>
+                                    </div>
+                                </li>
+                            );
+                        })}
+
+                    </ul>
+                ) : (
+                    <p className="empty-state">
+                        No players yet.
+                    </p>
+                )}
+
+            </section>
+        );
+    }
 
     function RenderDashboard(){
         return (

@@ -181,27 +181,7 @@
       "password": "test",
       "rating": -1,
       "role": "admin"
-    },
-    {
-      "name": "test2",
-      "email": "test2@test.com",
-      "password": "test",
-      "rating": -1,
-      "role": "member"
-    },
-    {
-      "name": "test3",
-      "email": "test3@test.com",
-      "password": "test",
-      "rating": -1,
-      "role": "member"
-    },
-    {
-      "name": "test4",
-      "email": "test4@test.com",
-      "password": "test",
-      "rating": -1,
-      "role": "member"
     }
+    
   ]
 }

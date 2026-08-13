@@ -96,6 +96,11 @@
   box-sizing: border-box;
 }
 
+.player-list-item.guest-item {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
 .BackToLists-button{
   position: absolute;
   top: 20px;

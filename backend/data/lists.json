@@ -4,7 +4,14 @@
       "name": "Ryan Huang",
       "email": "ryan.huang@example.com",
       "password": "test",
-      "rating": 5
+      "rating": 5,
+      "guest": "joshua.choc@example.com"
+    },
+    {
+      "name": "Joshua Choc",
+      "email": "joshua.choc@example.com",
+      "experienceLevel": 2,
+      "guestOf": "Ryan Huang"
     },
     {
       "name": "Ava Patel",
@@ -137,30 +144,12 @@
       "email": "emily.powell@example.com",
       "password": "test",
       "rating": 5
-    },
-    {
-      "name": "test2",
-      "email": "test2@test.com",
-      "password": "test",
-      "rating": -1
     }
   ],
   "waitlist-users": [
     {
-      "name": "test3",
-      "email": "test3@test.com",
-      "password": "test",
-      "rating": -1
-    },
-    {
       "name": "test",
       "email": "test@test.com",
-      "password": "test",
-      "rating": -1
-    },
-    {
-      "name": "test4",
-      "email": "test4@test.com",
       "password": "test",
       "rating": -1
     }
