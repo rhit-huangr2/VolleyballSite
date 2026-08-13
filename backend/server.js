@@ -219,6 +219,137 @@ const server = http.createServer(async (request, response) => {
         return;
     }
 
+	if (request.url === '/api/guest' && request.method === 'POST') {
+		try {
+			// Get session ID from cookie
+			const sessionId = getCookie(request, 'sessionId');
+
+			if (!sessionId) {
+				sendJson(response, 401, {
+					error: 'Not signed in.'
+				});
+				return;
+			}
+
+			// Get logged-in user
+			const loggedInUser = sessions.get(sessionId);
+
+			if (!loggedInUser) {
+				sendJson(response, 401, {
+					error: 'Session expired or invalid.'
+				});
+				return;
+			}
+
+			// Read guest information
+			const body = await readRequestBody(request);
+
+			const firstName = String(body.firstName || '').trim();
+			const lastName = String(body.lastName || '').trim();
+			const email = String(body.email || '').trim().toLowerCase();
+			const experienceLevel = String(
+				body.experienceLevel || ''
+			).trim();
+
+			// Validate guest information
+			if (
+				!firstName ||
+				!lastName ||
+				!email ||
+				!experienceLevel
+			) {
+				sendJson(response, 400, {
+					error: 'All guest fields are required.'
+				});
+				return;
+			}
+
+			const hostEmail = loggedInUser.email
+				.trim()
+				.toLowerCase();
+
+			// Load lists
+			const lists = await readLists();
+
+			const registeredUsers = lists['registered-users'] || [];
+			const waitlistUsers = lists['waitlist-users'] || [];
+
+			// Find host
+			const registeredHost = registeredUsers.find(
+				user =>
+					user.email.trim().toLowerCase() === hostEmail
+			);
+
+			const waitlistHost = waitlistUsers.find(
+				user =>
+					user.email.trim().toLowerCase() === hostEmail
+			);
+
+			// Determine which list the guest belongs in
+			let targetList;
+
+			if (registeredHost) {
+				targetList = registeredUsers;
+			}
+			else if (waitlistHost) {
+				targetList = waitlistUsers;
+			}
+			else {
+				sendJson(response, 400, {
+					error: 'You must be registered before adding a guest.'
+				});
+				return;
+			}
+
+			// Make sure the guest isn't already registered
+			const allPlayers = [
+				...registeredUsers,
+				...waitlistUsers
+			];
+
+			const duplicate = allPlayers.find(
+				player =>
+					player.email &&
+					player.email.trim().toLowerCase() === email
+			);
+
+			if (duplicate) {
+				sendJson(response, 409, {
+					error: 'A player or guest with this email already exists.'
+				});
+				return;
+			}
+
+			// Create guest
+			const guest = {
+				name: `${firstName} ${lastName}`,
+				email: email,
+				guestOf: hostEmail,
+				experienceLevel: experienceLevel
+			};
+
+			// Add guest to the same list as their host
+			targetList.push(guest);
+
+			// Save lists.json
+			await writeLists(lists);
+
+			sendJson(response, 201, {
+				message: 'Guest successfully registered.',
+				guest
+			});
+
+		} catch (error) {
+			console.error('Guest registration error:', error);
+
+			sendJson(response, 500, {
+				error: 'Unable to register guest.'
+			});
+		}
+
+		return;
+	}
+
 	if (request.url === '/api/signup' && request.method === 'POST') {
 		try {
 			const body = await readRequestBody(request);

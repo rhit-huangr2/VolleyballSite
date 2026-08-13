@@ -148,6 +148,12 @@
   ],
   "waitlist-users": [
     {
+      "name": "guest guest",
+      "email": "guest@example.com",
+      "guestOf": "test@test.com",
+      "experienceLevel": "beginner"
+    },
+    {
       "name": "test",
       "email": "test@test.com",
       "password": "test",
