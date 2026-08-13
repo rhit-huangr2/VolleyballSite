@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
+import EditUserModal from "./EditUserModal";
 
 function AdminMenu() {
 
     const [users, setUsers] = useState([]);
+
+    const [editingUser, setEditingUser] = useState(null);
+
+    const [editData, setEditData] = useState({});
+
 
     useEffect(() => {
         loadUsers();
@@ -10,71 +16,154 @@ function AdminMenu() {
 
 
     async function loadUsers() {
-        const response = await fetch('/api/admin/users');
-        const data = await response.json();
+        try {
+            const response = await fetch('/api/admin/users');
+            const data = await response.json();
 
-        console.log(data);
-
-        setUsers(data);
+            setUsers(data);
+        } catch (error) {
+            console.error('Failed to load users:', error);
+        }
     }
 
 
-    async function updateUser(email, updates) {
+    function startEditing(user) {
+        setEditingUser(user);
 
-        await fetch(
-            `/api/admin/users/${encodeURIComponent(email)}`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(updates)
+        setEditData({
+            name: user.name,
+            email: user.email,
+            rating: user.rating,
+            role: user.role
+        });
+    }
+
+
+    function closeEditModal() {
+        setEditingUser(null);
+        setEditData({});
+    }
+
+
+    function handleEditChange(event) {
+        const { name, value } = event.target;
+
+        setEditData((currentData) => ({
+            ...currentData,
+            [name]: value
+        }));
+    }
+
+
+    async function saveUser() {
+        try {
+            const response = await fetch(
+                `/api/admin/users/${encodeURIComponent(editingUser.email)}`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(editData)
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to update user.');
             }
-        );
-        // console.log(`Updated user ${email} with`, updates);
-        loadUsers();
+
+            await loadUsers();
+
+            closeEditModal();
+
+        } catch (error) {
+            console.error('Failed to update user:', error);
+        }
     }
 
 
     return (
-        <div>
-            <h1>Admin Menu</h1>
+        <>
+            <div className="admin-page-container">
 
-            {users.map(user => (
-                <div key={user.email}>
-                    <h3>{user.name}</h3>
+                <section className="list-card">
 
-                    <p>Email: {user.email}</p>
+                    <div className="list-card-header">
+                        <div>
+                            <h3>Users</h3>
 
-                    <p>
-                        Rating: {user.rating}
-                    </p>
+                            <p>
+                                {users.length} user
+                                {users.length === 1 ? '' : 's'}
+                            </p>
+                        </div>
+                    </div>
 
-                    <p>
-                        Role: {user.role}
-                    </p>
+                    {users.length ? (
 
+                        <ul className="player-list">
 
-                    {user.role === "member" && (
-                        <button
-                            onClick={() =>
-                                updateUser(
-                                    user.email,
-                                    {
-                                        role: "admin"
-                                    }
-                                )
-                            }
-                        >
-                            Make Admin
-                        </button>
+                            {users.map((user) => (
+
+                                <li
+                                    key={user.email}
+                                    className="player-list-item"
+                                >
+
+                                    <div>
+                                        <strong>
+                                            {user.name}
+                                        </strong>
+
+                                        <span>
+                                            {user.email}
+                                        </span>
+
+                                        <span>
+                                            Rating: {user.rating}
+                                        </span>
+
+                                        <span>
+                                            Role: {user.role}
+                                        </span>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        className="admin-button"
+                                        onClick={() =>
+                                            startEditing(user)
+                                        }
+                                    >
+                                        Edit
+                                    </button>
+
+                                </li>
+
+                            ))}
+
+                        </ul>
+
+                    ) : (
+
+                        <p className="empty-state">
+                            No users yet.
+                        </p>
+
                     )}
-                    <hr />  
 
+                </section>
 
-                </div>
-            ))}
-        </div>
+            </div>
+
+            <EditUserModal
+                user={editingUser}
+                editData={editData}
+                onChange={handleEditChange}
+                onSave={saveUser}
+                onClose={closeEditModal}
+            />
+        </>
     );
 }
 

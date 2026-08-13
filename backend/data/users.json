@@ -11,8 +11,8 @@
       "name": "Ryan Huang",
       "email": "ryan.huang@example.com",
       "password": "test",
-      "rating": 5,
-      "role": "member"
+      "rating": "4",
+      "role": "admin"
     },
     {
       "name": "Ava Patel",

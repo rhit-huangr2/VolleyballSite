@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import GuestRegistrationModal from './Components/GuestRegistrationModal';
-import AdminMenu from './Components/AdminMenu';
+import GuestRegistrationModal from '../Components/GuestRegistrationModal';
+import { useNavigate } from 'react-router-dom';
 
 function SignedInListsPage({
 	signedInUser,
@@ -14,7 +14,7 @@ function SignedInListsPage({
 }) {
 
     const [showGuestModal, setShowGuestModal] = useState(false);
-    const [showAdminMenu, setShowAdminMenu] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         checkRegistration();
@@ -152,16 +152,15 @@ function SignedInListsPage({
         );
     }
 
-    function renderAdminMenu() {
-        console.log('Admin menu button clicked');
-        setShowAdminMenu(true);
-    }
-
 	return (
         <div>
             <div className="button-panel">
                 {signedInUser?.role === 'admin' && (
-                    <button type="button" className="admin-button view-toggle-button active" onClick={renderAdminMenu}>
+                    <button
+                        type="button"
+                        className="admin-button view-toggle-button active"
+                        onClick={() => navigate('/admin')}
+                    >
                         Admin Menu
                     </button>
                 )}
@@ -172,9 +171,7 @@ function SignedInListsPage({
             <div className="dashboard-info">
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
             </div>
-            {showAdminMenu && (
-                <AdminMenu />
-            )}
+
             {RenderDashboard()}
             
         </div>

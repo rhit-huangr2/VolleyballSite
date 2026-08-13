@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import SignedInListsPage from './SignedInListsPage';
+import SignedInListsPage from './Pages/SignedInListsPage';
 import './App.css';
 import AuthForm from './Components/AuthForm';
+import { Routes, Route } from 'react-router-dom';
+import AdminPage from './Pages/AdminPage';
 
 
 function App() {
@@ -279,11 +281,29 @@ function App() {
   return (
     <div className="app-shell">
       <main className="registration-layout">
+
         <section className="hero-panel">
           {renderHeroCopy()}
         </section>
 
-        {renderForm()}
+        <Routes>
+
+          <Route
+            path="/"
+            element={renderForm()}
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <AdminPage
+                signedInUser={signedInUser}
+              />
+            }
+          />
+
+        </Routes>
+
       </main>
     </div>
   );
