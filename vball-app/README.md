@@ -1,8 +1,8 @@
 # IDEAS TO ADD
+- Admin should be able to manually change lists
+- guests (WIP)
 - Basketball signups
 - rating system
-- guests
-- fix components so sign in page doesnt come back every refresh
 
 # Getting Started with Create React App
 
