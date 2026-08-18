@@ -14,6 +14,10 @@ function SignedInListsPage({
 }) {
 
     const [showGuestModal, setShowGuestModal] = useState(false);
+    const [emailOptIn, setEmailOptIn] = useState(
+        signedInUser?.emailOptIn ?? true
+    );
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -77,6 +81,29 @@ function SignedInListsPage({
 
         } catch (error) {
             console.error('Withdrawal error:', error);
+        }
+    }
+
+    async function handleEmailPreferenceChange() {
+        try {
+            const response = await fetch('/api/email-preference', {
+                method: 'PUT'
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.error || 'Unable to update email preference.'
+                );
+            }
+
+            console.log('Email opt-in:', result.emailOptIn);
+
+            setEmailOptIn(result.emailOptIn);
+
+        } catch (error) {
+            console.error('Email preference update failed:', error);
         }
     }
 
@@ -197,6 +224,17 @@ function SignedInListsPage({
             </div>
             <div className="dashboard-info">
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
+            </div>
+            <div className="email-preferences">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={emailOptIn}
+                        onChange={handleEmailPreferenceChange}
+                    />
+
+                    <span>Receive email updates</span>
+                </label>
             </div>
 
             {RenderDashboard()}

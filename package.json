@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/rhit-huangr2/VolleyballSite/issues"
   },
-  "homepage": "https://github.com/rhit-huangr2/VolleyballSite#readme"
+  "homepage": "https://github.com/rhit-huangr2/VolleyballSite#readme",
+  "dependencies": {
+    "nodemailer": "^9.0.5"
+  }
 }

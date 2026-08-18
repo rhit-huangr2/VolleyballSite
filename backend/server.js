@@ -128,49 +128,7 @@ const server = http.createServer(async (request, response) => {
 
 		return;
 	}
-
-	// if (
-	// 	request.url.startsWith('/api/admin/users/') &&
-	// 	request.method === 'PUT'
-	// ) {
-	// 	try {
-	// 		const email = decodeURIComponent(
-	// 			request.url.split('/').pop()
-	// 		);
-
-	// 		const body = await readRequestBody(request);
-
-	// 		const users = await readUsers();
-
-	// 		const userIndex = users.findIndex(
-	// 			user => user.email === email
-	// 		);
-
-	// 		if (userIndex === -1) {
-	// 			sendJson(response, 404, {
-	// 				error: 'User not found.'
-	// 			});
-	// 			return;
-	// 		}
-
-	// 		users[userIndex] = {
-	// 			...users[userIndex],
-	// 			...body
-	// 		};
-
-	// 		await saveUsers(users);
-
-	// 		sendJson(response, 200, users[userIndex]);
-
-	// 	} catch (error) {
-	// 		sendJson(response, 500, {
-	// 			error: 'Unable to update user.'
-	// 		});
-	// 	}
-
-	// 	return;
-	// }
-
+	
 	if (request.url === '/api/health' && request.method === 'GET') {
 		sendJson(response, 200, { ok: true });
 		return;
@@ -350,6 +308,68 @@ const server = http.createServer(async (request, response) => {
 		return;
 	}
 
+	if (
+		request.url === '/api/email-preference' &&
+		request.method === 'PUT'
+	) {
+		try {
+			const sessionId = getCookie(request, 'sessionId');
+
+			if (!sessionId) {
+				sendJson(response, 401, {
+					error: 'Not signed in.'
+				});
+				return;
+			}
+
+			const loggedInUser = sessions.get(sessionId);
+
+			if (!loggedInUser) {
+				sendJson(response, 401, {
+					error: 'Session expired or invalid.'
+				});
+				return;
+			}
+
+			const users = await readUsers();
+
+			const user = users.find(
+				user =>
+					user.email.toLowerCase() ===
+					loggedInUser.email.toLowerCase()
+			);
+
+			if (!user) {
+				sendJson(response, 404, {
+					error: 'User not found.'
+				});
+				return;
+			}
+
+			// Toggle the email preference
+			user.emailOptIn = !user.emailOptIn;
+
+			await writeUsers(users);
+
+			// Keep the session's user information synchronized
+			loggedInUser.emailOptIn = user.emailOptIn;
+
+			sendJson(response, 200, {
+				message: 'Email preference updated.',
+				emailOptIn: user.emailOptIn
+			});
+
+		} catch (error) {
+			console.error('Email preference error:', error);
+
+			sendJson(response, 500, {
+				error: 'Unable to update email preference.'
+			});
+		}
+
+		return;
+	}
+
 	if (request.url === '/api/signup' && request.method === 'POST') {
 		try {
 			const body = await readRequestBody(request);
@@ -358,6 +378,7 @@ const server = http.createServer(async (request, response) => {
 			const password = String(body.password || '');
 			const rating = -1; // Default rating for new users
 			const role = 'member'; // Default role for new users
+			const emailOptIn = true; // Default email opt-in for new users
 
 			if (!name || !email || !password) {
 				sendJson(response, 400, {
@@ -377,7 +398,7 @@ const server = http.createServer(async (request, response) => {
 			}
 
 
-			const user = await createUser({ name, email, password, rating });
+			const user = await createUser({ name, email, password, rating, role, emailOptIn });
 
 			sendJson(response, 201, {
 				message: 'Account created successfully.',

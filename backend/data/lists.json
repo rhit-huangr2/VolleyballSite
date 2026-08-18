@@ -154,6 +154,12 @@
       "experienceLevel": "beginner"
     },
     {
+      "name": "Evan Testa",
+      "email": "evan.testa@example.com",
+      "guestOf": "test@test.com",
+      "experienceLevel": "beginner"
+    },
+    {
       "name": "test",
       "email": "test@test.com",
       "password": "test",
