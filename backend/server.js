@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const http = require('http');
 const {
 	readUsers,
@@ -12,6 +14,7 @@ const {
 	deleteListEntry
 } = require('./data/jsonCrud');
 const crypto = require('crypto');
+const { sendEmail } = require('./emailService');
 const sessions = new Map();
 const port = process.env.PORT || 5001;
 
@@ -123,6 +126,43 @@ const server = http.createServer(async (request, response) => {
 
 			sendJson(response, 500, {
 				error: "Failed to update user"
+			});
+		}
+
+		return;
+	}
+
+	if (
+		request.url === '/api/test-email' &&
+		request.method === 'POST'
+	) {
+		try {
+			const body = await readRequestBody(request);
+
+			const email = String(body.email || '').trim();
+
+			if (!email) {
+				sendJson(response, 400, {
+					error: 'Email is required.'
+				});
+				return;
+			}
+
+			await sendEmail(
+				email,
+				'CEMC Volleyball Test Email',
+				'This is a test email from the CEMC Volleyball website.'
+			);
+
+			sendJson(response, 200, {
+				message: 'Email sent successfully.'
+			});
+
+		} catch (error) {
+			console.error('Email error:', error);
+
+			sendJson(response, 500, {
+				error: 'Unable to send email.'
 			});
 		}
 
@@ -632,7 +672,11 @@ const server = http.createServer(async (request, response) => {
 		console.log('loggedInUser email:', loggedInUser.email);
 		console.log('Registered users:', registeredUsers.map(u => u.email));
 		console.log('Is registered or waitlisted:', isRegistered);
-
+		console.log('Email user:', process.env.EMAIL_USER);
+		console.log(
+			'Email password loaded:',
+			Boolean(process.env.EMAIL_PASSWORD)
+		);
 		sendJson(response, 200, {
 			isRegistered
 		});

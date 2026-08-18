@@ -23,6 +23,34 @@ function App() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
 
+  // TEMPORARY FUNCTION FOR TESTING EMAIL FUNCTIONALITY
+  async function testEmail() {
+    try {
+      const response = await fetch('/api/test-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: 'ryandhuang123@gmail.com'
+        })
+      });
+
+      const result = await response.json();
+
+      console.log('Email response:', result);
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to send email.');
+      }
+
+      alert('Test email sent!');
+    } catch (error) {
+      console.error('Email test failed:', error);
+      alert(error.message);
+    }
+  }
+
   async function refreshPlayerLists() {
     const response = await fetch('/api/lists');
     const result = await response.json();
@@ -285,6 +313,14 @@ function App() {
         <section className="hero-panel">
           {renderHeroCopy()}
         </section>
+
+        {/* TEMPORARY BUTTON FOR TESTING EMAIL FUNCTIONALITY */}
+        <button
+          type="button"
+          onClick={testEmail}
+        >
+          Test Email
+        </button>
 
         <Routes>
 
