@@ -1,4 +1,5 @@
 # IDEAS TO ADD
+- EMAILS
 - Admin should be able to manually change lists
 - guests (WIP)
 - Basketball signups
