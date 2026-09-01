@@ -1,5 +1,4 @@
-const { writeUsers } = require('../src/jsonCrud');
-const { registeredUsers: seededUsers } = require('./seedUsers');
+const { writeUsers } = require('../backend/data/jsonCrud'); const { registeredUsers: seededUsers } = require('./seedUsers');
 
 async function populateUsers() {
 	await writeUsers(seededUsers);

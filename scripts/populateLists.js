@@ -1,5 +1,4 @@
-const { writeLists } = require('../src/jsonCrud');
-const { registeredUsers } = require('./seedUsers');
+const { writeLists } = require('../backend/data/jsonCrud'); const { registeredUsers } = require('./seedUsers');
 
 const waitlistUsers = [];
 
