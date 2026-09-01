@@ -14,7 +14,7 @@
       "password": "test",
       "rating": "4",
       "role": "admin",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Ava Patel",
@@ -22,7 +22,7 @@
       "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Jordan Lee",
@@ -30,7 +30,7 @@
       "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Mia Chen",
@@ -38,7 +38,7 @@
       "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Noah Wilson",
@@ -46,7 +46,7 @@
       "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Ethan Brooks",
@@ -54,7 +54,7 @@
       "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Sophia Kim",
@@ -62,7 +62,7 @@
       "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Liam Carter",
@@ -70,7 +70,7 @@
       "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Isabella Nguyen",
@@ -78,7 +78,7 @@
       "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Mason Rivera",
@@ -86,7 +86,7 @@
       "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Olivia Torres",
@@ -94,7 +94,7 @@
       "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Lucas Bennett",
@@ -102,7 +102,7 @@
       "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Amelia Foster",
@@ -110,7 +110,7 @@
       "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Benjamin Price",
@@ -118,7 +118,7 @@
       "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Charlotte Gray",
@@ -126,7 +126,7 @@
       "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Henry Long",
@@ -134,7 +134,7 @@
       "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Harper James",
@@ -142,7 +142,7 @@
       "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Elijah Reed",
@@ -150,7 +150,7 @@
       "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Evelyn Ward",
@@ -158,7 +158,7 @@
       "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "James Cooper",
@@ -166,7 +166,7 @@
       "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Abigail Cox",
@@ -174,7 +174,7 @@
       "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Alexander Diaz",
@@ -182,7 +182,7 @@
       "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Emily Powell",
@@ -190,7 +190,7 @@
       "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "Michael Perry",
@@ -198,7 +198,7 @@
       "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "test",

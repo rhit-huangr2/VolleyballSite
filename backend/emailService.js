@@ -2,6 +2,12 @@ const nodemailer = require('nodemailer');
 
 require('dotenv').config();
 
+const {
+    registrationOpenEmail,
+    waitlistEmail,
+    promotionEmail
+} = require('./emailTemplates');
+
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
@@ -21,20 +27,27 @@ async function sendEmail(to, subject, text) {
     });
 }
 
-async function sendEmailToOptedInUsers(users, subject, text) {
+async function sendEmailToOptedInUsers(users, emailTemplate) {
     const recipients = users.filter(
         user => user.emailOptIn === true
     );
 
+    console.log(`Found ${recipients.length} opted-in users.`);
+
+    let sentCount = 0;
+
     for (const user of recipients) {
         try {
+            const email = emailTemplate(user.name);
+
             await sendEmail(
                 user.email,
-                subject,
-                text
+                email.subject,
+                email.text
             );
 
-            console.log(`Email sent to ${user.email}`);
+            sentCount++;
+
         } catch (error) {
             console.error(
                 `Failed to send email to ${user.email}:`,
@@ -42,6 +55,8 @@ async function sendEmailToOptedInUsers(users, subject, text) {
             );
         }
     }
+
+    console.log(`Sent registration emails to ${sentCount} users.`);
 }
 
 module.exports = {

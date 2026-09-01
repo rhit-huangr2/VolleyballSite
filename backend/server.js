@@ -1,6 +1,9 @@
 require('dotenv').config();
 
+
 const http = require('http');
+const crypto = require('crypto');
+const cron = require('node-cron');
 const {
 	readUsers,
 	writeUsers,
@@ -13,8 +16,12 @@ const {
 	updateListEntry,
 	deleteListEntry
 } = require('./data/jsonCrud');
-const crypto = require('crypto');
-const { sendEmail } = require('./emailService');
+const { sendEmail, sendEmailToOptedInUsers } = require('./emailService');
+const {
+	registrationOpenEmail,
+	waitlistEmail,
+	promotionEmail
+} = require('./emailTemplates');
 const sessions = new Map();
 const port = process.env.PORT || 5001;
 
@@ -35,6 +42,17 @@ function getCookie(request, name) {
 	return cookie
 		? decodeURIComponent(cookie.split('=')[1])
 		: null;
+}
+
+async function clearPlayerLists() {
+	const lists = await readLists();
+
+	lists['registered-users'] = [];
+	lists['waitlist-users'] = [];
+
+	await writeLists(lists);
+
+	console.log('Weekly player lists cleared.');
 }
 
 async function readRequestBody(request) {
@@ -687,6 +705,26 @@ const server = http.createServer(async (request, response) => {
 	sendJson(response, 404, {
 		error: 'Not found'
 	});
+});
+
+cron.schedule('0 8 * * 6', async () => {
+	console.log('Running Saturday volleyball automation...');
+
+	try {
+		const users = await readUsers();
+
+		await clearPlayerLists();
+		await sendEmailToOptedInUsers(
+			users,
+			registrationOpenEmail
+		);
+
+		console.log('Saturday volleyball automation completed.');
+	} catch (error) {
+		console.error('Saturday automation failed:', error);
+	}
+}, {
+	timezone: 'America/New_York'
 });
 
 server.listen(port, () => {

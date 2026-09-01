@@ -1,3 +1,20 @@
+function registrationOpenEmail() {
+    return {
+        subject: 'CEMC Volleyball Registration',
+        text: `Hello Everyone!
+
+This coming Monday night, we are on for Volleyball at CEMC gym facility (Chuang Hall) from 7pm-10pm.
+
+If you would like to play, please respond within 24 hours of this email being sent out ONLY if you are attending.
+
+Stay safe!
+
+In Christ,
+
+CVG`
+    };
+}
+
 function registrationEmail(name) {
     return {
         subject: 'CEMC Volleyball Registration',
@@ -32,6 +49,7 @@ See you at volleyball!`
 }
 
 module.exports = {
+    registrationOpenEmail,
     registrationEmail,
     waitlistEmail,
     promotionEmail
