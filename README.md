@@ -1,5 +1,11 @@
 # IDEAS TO ADD
 - EMAILS
+    - Registration Open (complete)
+    - Cancelation
+    - Registered List full/ waitlist now open
+    - Registration confirmation ???
+    - Autobalanced teams ???
+
 - Admin should be able to manually change lists
 - guests (WIP)
 - Basketball signups
