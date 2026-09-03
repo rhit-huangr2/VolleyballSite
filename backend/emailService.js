@@ -18,12 +18,12 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-async function sendEmail(to, subject, text) {
+async function sendEmail(to, subject, html) {
     return transporter.sendMail({
         from: process.env.EMAIL_USER,
         to,
         subject,
-        text
+        html
     });
 }
 
@@ -43,7 +43,7 @@ async function sendEmailToOptedInUsers(users, emailTemplate) {
             await sendEmail(
                 user.email,
                 email.subject,
-                email.text
+                email.html
             );
 
             sentCount++;

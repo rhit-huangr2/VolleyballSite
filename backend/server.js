@@ -155,32 +155,22 @@ const server = http.createServer(async (request, response) => {
 		request.method === 'POST'
 	) {
 		try {
-			const body = await readRequestBody(request);
+			const users = await readUsers();
 
-			const email = String(body.email || '').trim();
-
-			if (!email) {
-				sendJson(response, 400, {
-					error: 'Email is required.'
-				});
-				return;
-			}
-
-			await sendEmail(
-				email,
-				'CEMC Volleyball Test Email',
-				'This is a test email from the CEMC Volleyball website.'
+			await sendEmailToOptedInUsers(
+				users,
+				registrationOpenEmail
 			);
 
 			sendJson(response, 200, {
-				message: 'Email sent successfully.'
+				message: 'Registration emails sent successfully.'
 			});
 
 		} catch (error) {
-			console.error('Email error:', error);
+			console.error('Registration email error:', error);
 
 			sendJson(response, 500, {
-				error: 'Unable to send email.'
+				error: 'Unable to send registration emails.'
 			});
 		}
 
