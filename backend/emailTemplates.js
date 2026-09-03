@@ -7,7 +7,6 @@ function getNextMonday() {
     nextMonday.setDate(today.getDate() + daysUntilMonday);
 
     return nextMonday.toLocaleDateString('en-US', {
-        weekday: 'long',
         month: 'long',
         day: 'numeric'
     });
@@ -15,9 +14,14 @@ function getNextMonday() {
 
 function registrationOpenEmail() {
     const mondayDate = getNextMonday();
+    const date = new Date(`${mondayDate}, ${new Date().getFullYear()}`);
+
+    const mondayShortDate =
+        `${String(date.getMonth() + 1).padStart(2, '0')}/` +
+        `${String(date.getDate()).padStart(2, '0')}`;
 
     return {
-        subject: 'PLEASE REPLY- Volleyball Monday <> @7PM',
+        subject: `PLEASE REPLY- Volleyball Monday ${mondayShortDate} @7PM`,
         html: `
             <div style="font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;">
 
