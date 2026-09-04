@@ -19,6 +19,7 @@ const {
 const { sendEmail, sendEmailToOptedInUsers } = require('./emailService');
 const {
 	registrationOpenEmail,
+	volleyballCanceledEmail,
 	waitlistEmail,
 	promotionEmail
 } = require('./emailTemplates');
@@ -159,7 +160,7 @@ const server = http.createServer(async (request, response) => {
 
 			await sendEmailToOptedInUsers(
 				users,
-				registrationOpenEmail
+				volleyballCanceledEmail
 			);
 
 			sendJson(response, 200, {
@@ -712,6 +713,29 @@ cron.schedule('0 8 * * 6', async () => {
 		console.log('Saturday volleyball automation completed.');
 	} catch (error) {
 		console.error('Saturday automation failed:', error);
+	}
+}, {
+	timezone: 'America/New_York'
+});
+
+cron.schedule('0 4 * * 1', async () => {
+	console.log('Running Monday volleyball automation...');
+
+	try {
+		const users = await readUsers();
+		const lists = await readLists();
+		const registeredUsers = lists['registered-users'];
+
+		if (registeredUsers && registeredUsers.length < 10) {
+			await sendEmailToOptedInUsers(
+				users,
+				volleyballCanceledEmail
+			);
+		}
+
+		console.log('Monday volleyball automation completed.');
+	} catch (error) {
+		console.error('Monday automation failed:', error);
 	}
 }, {
 	timezone: 'America/New_York'

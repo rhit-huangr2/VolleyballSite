@@ -225,6 +225,21 @@ function registrationOpenEmail() {
     };
 }
 
+function volleyballCanceledEmail(name) {
+    return {
+        subject: 'CEMC Volleyball Canceled',
+        html: `
+            <div style="font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;">
+                <p>Hello Everyone!</p>
+
+                <p>We do not have enough players for this tonight's volleyball session.
+                Since we do not have full teams, we regret to inform you that the CEMC
+                Volleyball game scheduled for this coming Monday has been canceled.</p>
+            </div>
+        `
+    };
+}
+
 function registrationEmail(name) {
     return {
         subject: 'CEMC Volleyball Registration',
@@ -260,6 +275,7 @@ See you at volleyball!`
 
 module.exports = {
     registrationOpenEmail,
+    volleyballCanceledEmail,
     registrationEmail,
     waitlistEmail,
     promotionEmail

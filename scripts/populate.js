@@ -1,7 +1,20 @@
 const populateUsers = require('./populateUsers');
 const populateLists = require('./populateLists');
+const { readLists, writeLists } = require('./../backend/data/jsonCrud');
 
 async function populateJsonFiles(mode = 'all') {
+	if (mode === 'clists') {
+		console.log('CLEAR MODE STARTED');
+		const lists = await readLists();
+
+		lists['registered-users'] = [];
+		lists['waitlist-users'] = [];
+
+		await writeLists(lists);
+
+		return;
+	}
+
 	if (mode === 'users') {
 		await populateUsers();
 		return;
