@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-
 const http = require('http');
 const crypto = require('crypto');
 const cron = require('node-cron');
@@ -16,15 +15,24 @@ const {
 	updateListEntry,
 	deleteListEntry
 } = require('./data/jsonCrud');
-const { sendEmail, sendEmailToOptedInUsers } = require('./emailService');
+
+const {
+	sendEmailToOptedInUsers,
+} = require('./emailService'); 
+
 const {
 	registrationOpenEmail,
 	volleyballCanceledEmail,
+	registrationFullEmail,
+	registrationEmail,
 	waitlistEmail,
 	promotionEmail
 } = require('./emailTemplates');
+const registrationEvents = require('./registrationEvents');
 const sessions = new Map();
 const port = process.env.PORT || 5001;
+
+const MAX_REGISTERED_USERS = 24;
 
 function sendJson(response, statusCode, payload) {
 	response.writeHead(statusCode, {
@@ -56,6 +64,18 @@ async function clearPlayerLists() {
 	console.log('Weekly player lists cleared.');
 }
 
+async function saveRegistrationMessageId(messageId) {
+	const lists = await readLists();
+
+	if (!lists['email-metadata']) {
+		lists['email-metadata'] = {};
+	}
+
+	lists['email-metadata']['registration-message-id'] = messageId;
+
+	await writeLists(lists);
+}
+
 async function readRequestBody(request) {
 	return new Promise((resolve, reject) => {
 		let body = '';
@@ -80,6 +100,39 @@ async function readRequestBody(request) {
 		request.on('error', reject);
 	});
 }
+
+registrationEvents.on('registrationFull', async () => {
+	try {
+
+		const users = await readUsers();
+		const lists = await readLists();
+		console.log(
+			'*** registrationFull EVENT RECEIVED ***'
+		);
+		const registrationMessageId =
+			lists['email-metadata']?.['registration-message-id'];
+
+		if (!registrationMessageId) {
+			console.error(
+				'No registration-open Message-ID found.'
+			);
+			return;
+		}
+
+		await sendEmailToOptedInUsers(
+			users,
+			registrationFullEmail,
+			registrationMessageId
+		);
+
+		console.log('Registration-full email sent.');
+	} catch (error) {
+		console.error(
+			'Failed to send registration-full email:',
+			error
+		);
+	}
+});
 
 const server = http.createServer(async (request, response) => {
 	console.log('Request URL:', request.url);
@@ -119,7 +172,6 @@ const server = http.createServer(async (request, response) => {
 			console.log("updates:", updates);
 
 			const data = await readUsers();
-			// console.log("users:", data);
 			const user = data.find(
 				u => u.email === email
 			);
@@ -204,19 +256,53 @@ const server = http.createServer(async (request, response) => {
             const password = String(body.password || '');
             const rating = Number(body.rating || -1);
 
-            const lists = await readLists();
-            const placementListName = lists['registered-users'].length >= 24 ? 'waitlist-users' : 'registered-users';
-            const duplicateEmail = lists['registered-users'].find((player) => player.email === email) || lists['waitlist-users'].find((player) => player.email === email);
-			
-            if (duplicateEmail) {
+			const lists = await readLists();
+
+			const registeredUsers = lists['registered-users'] || [];
+			const waitlistUsers = lists['waitlist-users'] || [];
+
+			const wasFull = registeredUsers.length >= MAX_REGISTERED_USERS;
+
+			const placementListName =
+				registeredUsers.length >= MAX_REGISTERED_USERS
+					? 'waitlist-users'
+					: 'registered-users';
+
+			const duplicateEmail =
+				registeredUsers.find((player) => player.email === email) ||
+				waitlistUsers.find((player) => player.email === email);
+
+			if (duplicateEmail) {
 				sendJson(response, 409, {
 					error: 'You are already registered.'
-                });
-                return;
-            }
-            await createListEntry(placementListName, { name, email, password, rating });
+				});
+				return;
+			}
 
-            sendJson(response, 201, { message: 'List entry created successfully.' });
+			await createListEntry(
+				placementListName,
+				{ name, email, password, rating }
+			);
+
+			// Only check for "full" if this user was actually added
+			// to the registered list.
+			if (placementListName === 'registered-users') {
+				const updatedLists = await readLists();
+				const updatedRegisteredUsers =
+					updatedLists['registered-users'] || [];
+
+				const isNowFull =
+					updatedRegisteredUsers.length >= MAX_REGISTERED_USERS;
+
+				if (!wasFull && isNowFull) {
+					registrationEvents.emit('registrationFull');
+					console.log('Registration is now full. Event emitted.');
+				}
+			}
+
+			sendJson(response, 201, {
+				message: 'List entry created successfully.'
+			});
         } catch (error) {
             sendJson(response, 500, {
                 error: 'Unable to create list entry.'
@@ -653,7 +739,7 @@ const server = http.createServer(async (request, response) => {
 
 		const loggedInUser = sessions.get(sessionId);
 
-		console.log('Logged-in user:', loggedInUser);
+		// console.log('Logged-in user:', loggedInUser);
 
 		if (!loggedInUser) {
 			sendJson(response, 401, {
@@ -678,14 +764,14 @@ const server = http.createServer(async (request, response) => {
 					entry.email.trim().toLowerCase() ===
 					loggedInUser.email.trim().toLowerCase()
 			);
-		console.log('loggedInUser email:', loggedInUser.email);
-		console.log('Registered users:', registeredUsers.map(u => u.email));
-		console.log('Is registered or waitlisted:', isRegistered);
-		console.log('Email user:', process.env.EMAIL_USER);
-		console.log(
-			'Email password loaded:',
-			Boolean(process.env.EMAIL_PASSWORD)
-		);
+		// console.log('loggedInUser email:', loggedInUser.email);
+		// console.log('Registered users:', registeredUsers.map(u => u.email));
+		// console.log('Is registered or waitlisted:', isRegistered);
+		// console.log('Email user:', process.env.EMAIL_USER);
+		// console.log(
+		// 	'Email password loaded:',
+		// 	Boolean(process.env.EMAIL_PASSWORD)
+		// );
 		sendJson(response, 200, {
 			isRegistered
 		});
@@ -698,18 +784,23 @@ const server = http.createServer(async (request, response) => {
 	});
 });
 
-cron.schedule('0 8 * * 6', async () => {
+cron.schedule('* * * * *', async () => {
 	console.log('Running Saturday volleyball automation...');
 
 	try {
 		const users = await readUsers();
 
 		await clearPlayerLists();
-		await sendEmailToOptedInUsers(
+
+		const emailInfo = await sendEmailToOptedInUsers(
 			users,
 			registrationOpenEmail
 		);
+		console.log('Registration email Message-ID:', emailInfo?.messageId);
 
+		if (emailInfo?.messageId) {
+			await saveRegistrationMessageId(emailInfo.messageId);
+		}
 		console.log('Saturday volleyball automation completed.');
 	} catch (error) {
 		console.error('Saturday automation failed:', error);

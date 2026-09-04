@@ -22,7 +22,7 @@ const registeredUsers = [
 	{ name: 'Abigail Cox', email: 'abigail.cox@example.com', password: 'test', rating: 4, role: 'member', emailOptIn: false },
 	{ name: 'Alexander Diaz', email: 'alexander.diaz@example.com', password: 'test', rating: 2, role: 'member', emailOptIn: false },
 	{ name: 'Emily Powell', email: 'emily.powell@example.com', password: 'test', rating: 5, role: 'member', emailOptIn: false },
-	{ name: 'Michael Perry', email: 'michael.perry@example.com', password: 'test', rating: 3, role: 'member', emailOptIn: false },
+	// { name: 'Michael Perry', email: 'michael.perry@example.com', password: 'test', rating: 3, role: 'member', emailOptIn: false },
 ];
 
 module.exports = {

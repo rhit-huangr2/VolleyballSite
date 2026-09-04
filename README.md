@@ -1,8 +1,9 @@
 # IDEAS TO ADD
 - EMAILS
     - Registration Open (complete)
-    - Cancelation
-    - Registered List full/ waitlist now open
+    - Cancelation (complete)
+    - Registered List full/ waitlist now open (implementation done, format needs work)
+        - check for bug with manually changed lists
     - Registration confirmation ???
     - Autobalanced teams ???
 

@@ -67,8 +67,13 @@ async function readLists() {
   const data = await readJsonFile(listsFilePath);
 
   return {
-    'registered-users': Array.isArray(data['registered-users']) ? data['registered-users'] : [],
-    'waitlist-users': Array.isArray(data['waitlist-users']) ? data['waitlist-users'] : []
+    ...data,
+    'registered-users': Array.isArray(data['registered-users'])
+      ? data['registered-users']
+      : [],
+    'waitlist-users': Array.isArray(data['waitlist-users'])
+      ? data['waitlist-users']
+      : []
   };
 }
 

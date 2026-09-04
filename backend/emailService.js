@@ -18,17 +18,30 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-async function sendEmail(to, subject, html, bcc) {
+async function sendEmail(
+    to,
+    subject,
+    html,
+    bcc,
+    inReplyTo = null,
+    references = null
+) {
     return transporter.sendMail({
         from: process.env.EMAIL_USER,
         to,
         bcc,
         subject,
-        html
+        html,
+        inReplyTo,
+        references
     });
 }
 
-async function sendEmailToOptedInUsers(users, emailTemplate) {
+async function sendEmailToOptedInUsers(
+    users,
+    emailTemplate,
+    inReplyTo = null
+) {
     const recipients = users.filter(
         user => user.emailOptIn === true
     );
@@ -37,22 +50,26 @@ async function sendEmailToOptedInUsers(users, emailTemplate) {
 
     if (recipients.length === 0) {
         console.log('No opted-in users to email.');
-        return;
+        return null;
     }
 
     const email = emailTemplate();
 
-    await sendEmail(
+    const info = await sendEmail(
         process.env.EMAIL_USER,
         email.subject,
         email.html,
-        recipients.map(user => user.email)
+        recipients.map(user => user.email),
+        inReplyTo,
+        inReplyTo
     );
 
-    console.log(`Sent registration email to ${recipients.length} users.`);
+    console.log(`Sent email to ${recipients.length} users.`);
+
+    return info;
 }
 
 module.exports = {
     sendEmail,
-    sendEmailToOptedInUsers
+    sendEmailToOptedInUsers,
 };

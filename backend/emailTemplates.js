@@ -225,7 +225,7 @@ function registrationOpenEmail() {
     };
 }
 
-function volleyballCanceledEmail(name) {
+function volleyballCanceledEmail() {
     return {
         subject: 'CEMC Volleyball Canceled',
         html: `
@@ -240,10 +240,35 @@ function volleyballCanceledEmail(name) {
     };
 }
 
-function registrationEmail(name) {
+function registrationFullEmail() {
+    return {
+        subject: 'CEMC Volleyball Registration Full',
+        html: `< div style = "font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;" >
+                <p>Hey Everyone!!</p>
+
+                <p>
+                    We’ve reached our maximum of 24 players for volleyball tomorrow,
+                    so we’ll be running with three teams.
+                </p>
+
+                <p>
+                    If anyone drops out or leaves early, spots will be filled by
+                    those on the waitlist in the order listed.
+                </p>
+
+                <p>
+                    If both players agree, a participant and someone on the waitlist
+                    can take turns alternating every other game.
+                </p>
+            </div >`
+    };
+}
+
+
+function registrationEmail() {
     return {
         subject: 'CEMC Volleyball Registration',
-        text: `Hi ${name},
+        text: `Hi everyone!,
 
 You have successfully registered for CEMC Volleyball.
 
@@ -251,10 +276,10 @@ Thank you!`
     };
 }
 
-function waitlistEmail(name) {
+function waitlistEmail() {
     return {
         subject: 'CEMC Volleyball Waitlist',
-        text: `Hi ${name},
+        text: `Hi everyone!,
 
 You have been added to the CEMC Volleyball waitlist.
 
@@ -262,10 +287,10 @@ We will notify you if a spot becomes available.`
     };
 }
 
-function promotionEmail(name) {
+function promotionEmail() {
     return {
         subject: 'CEMC Volleyball Registration Confirmed',
-        text: `Hi ${name},
+        text: `Hi everyone!,
 
 A spot has opened and you have been moved from the waitlist to the registered player list.
 
@@ -276,6 +301,7 @@ See you at volleyball!`
 module.exports = {
     registrationOpenEmail,
     volleyballCanceledEmail,
+    registrationFullEmail,
     registrationEmail,
     waitlistEmail,
     promotionEmail
