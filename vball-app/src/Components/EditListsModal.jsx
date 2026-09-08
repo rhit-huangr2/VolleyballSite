@@ -249,11 +249,13 @@ function EditListsModal({ playerLists, onClose }) {
                             <span>{registeredUsers.length}</span>
                         </div>
 
-                        <ul className="edit-player-list">
-                            {registeredUsers.map(player =>
-                                renderPlayer(player, 'registered')
-                            )}
-                        </ul>
+                        <div className="edit-player-list-container">
+                            <ul className="edit-player-list">
+                                {registeredUsers.map(player =>
+                                    renderPlayer(player, 'registered')
+                                )}
+                            </ul>
+                        </div>
                     </section>
 
                     {/* WAITLIST */}
@@ -267,11 +269,13 @@ function EditListsModal({ playerLists, onClose }) {
                             <span>{waitlistUsers.length}</span>
                         </div>
 
-                        <ul className="edit-player-list">
-                            {waitlistUsers.map(player =>
-                                renderPlayer(player, 'waitlist')
-                            )}
-                        </ul>
+                        <div className="edit-player-list-container">
+                            <ul className="edit-player-list">
+                                {waitlistUsers.map(player =>
+                                    renderPlayer(player, 'waitlist')
+                                )}
+                            </ul>
+                        </div>
                     </section>
 
                     {/* UNREGISTERED */}
@@ -285,11 +289,13 @@ function EditListsModal({ playerLists, onClose }) {
                             <span>{unregisteredUsers.length}</span>
                         </div>
 
-                        <ul className="edit-player-list">
-                            {unregisteredUsers.map(user =>
-                                renderPlayer(user, 'unregistered')
-                            )}
-                        </ul>
+                        <div className="edit-player-list-container">
+                            <ul className="edit-player-list">
+                                {unregisteredUsers.map(user =>
+                                    renderPlayer(user, 'unregistered')
+                                )}
+                            </ul>
+                        </div>
                     </section>
 
                 </div>

@@ -315,12 +315,12 @@ function App() {
         </section>
 
         {/* TEMPORARY BUTTON FOR TESTING EMAIL FUNCTIONALITY */}
-        <button
+        {/* <button
           type="button"
           onClick={testEmail}
         >
           Test Email
-        </button>
+        </button> */}
 
         <Routes>
 
