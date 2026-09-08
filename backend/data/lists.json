@@ -214,6 +214,7 @@
     }
   ],
   "email-metadata": {
-    "registration-message-id": "<7cc623d8-cc6c-6e61-8fbc-2a7887e2ea40@gmail.com>"
+    "registration-message-id": "<7cc623d8-cc6c-6e61-8fbc-2a7887e2ea40@gmail.com>",
+    "registration-full-email-sent": false
   }
 }

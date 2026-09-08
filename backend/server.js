@@ -103,14 +103,32 @@ async function readRequestBody(request) {
 
 registrationEvents.on('registrationFull', async () => {
 	try {
-
-		const users = await readUsers();
 		const lists = await readLists();
+
 		console.log(
 			'*** registrationFull EVENT RECEIVED ***'
 		);
+
+		// Check if the full-registration email
+		// has already been sent this week.
+		const alreadySent =
+			lists['email-metadata']?.[
+			'registration-full-email-sent'
+			];
+
+		if (alreadySent) {
+			console.log(
+				'Registration-full email already sent this week. Skipping.'
+			);
+			return;
+		}
+
+		const users = await readUsers();
+
 		const registrationMessageId =
-			lists['email-metadata']?.['registration-message-id'];
+			lists['email-metadata']?.[
+			'registration-message-id'
+			];
 
 		if (!registrationMessageId) {
 			console.error(
@@ -125,7 +143,21 @@ registrationEvents.on('registrationFull', async () => {
 			registrationMessageId
 		);
 
-		console.log('Registration-full email sent.');
+		// Mark the email as sent.
+		if (!lists['email-metadata']) {
+			lists['email-metadata'] = {};
+		}
+
+		lists['email-metadata'][
+			'registration-full-email-sent'
+		] = true;
+
+		await writeLists(lists);
+
+		console.log(
+			'Registration-full email sent and marked as sent.'
+		);
+
 	} catch (error) {
 		console.error(
 			'Failed to send registration-full email:',
@@ -182,7 +214,7 @@ const server = http.createServer(async (request, response) => {
 
 		return;
 	}
-	
+
 	if (request.url.startsWith('/api/admin/users/') && request.method === 'PUT') {
 		try {
 			const email = decodeURIComponent(
@@ -845,6 +877,18 @@ cron.schedule('0 9 * * 6', async () => {
 		const users = await readUsers();
 
 		await clearPlayerLists();
+
+		const lists = await readLists();
+
+		if (!lists['email-metadata']) {
+			lists['email-metadata'] = {};
+		}
+
+		lists['email-metadata'][
+			'registration-full-email-sent'
+		] = false;
+
+		await writeLists(lists);
 
 		const emailInfo = await sendEmailToOptedInUsers(
 			users,
