@@ -243,7 +243,8 @@ function volleyballCanceledEmail() {
 function registrationFullEmail() {
     return {
         subject: 'CEMC Volleyball Registration Full',
-        html: `< div style = "font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;" >
+        html: `
+            < div style = "font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;" >
                 <p>Hey Everyone!!</p>
 
                 <p>
@@ -260,7 +261,8 @@ function registrationFullEmail() {
                     If both players agree, a participant and someone on the waitlist
                     can take turns alternating every other game.
                 </p>
-            </div >`
+            </div >
+        `
     };
 }
 
