@@ -7,8 +7,10 @@
     - Registration confirmation ???
     - Autobalanced teams ???
 
-- Admin should be able to manually change lists
-- guests (WIP)
+- Admin should be able to manually change lists (complete)
+    - fix CSS
+- guests
+    - fix CSS
 - Basketball signups
 - rating system
 
