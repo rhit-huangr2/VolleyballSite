@@ -150,10 +150,31 @@ const server = http.createServer(async (request, response) => {
 
 	if (request.url === '/api/admin/users' && request.method === 'GET') {
 		try {
+			const sessionId = getCookie(request, 'sessionId');
+
+			if (!sessionId) {
+				sendJson(response, 401, {
+					error: 'Not signed in.'
+				});
+				return;
+			}
+
+			const loggedInUser = sessions.get(sessionId);
+
+			if (!loggedInUser || loggedInUser.role !== 'admin') {
+				sendJson(response, 403, {
+					error: 'Admin access required.'
+				});
+				return;
+			}
+
 			const users = await readUsers();
 
 			sendJson(response, 200, users);
+
 		} catch (error) {
+			console.error('Failed to load users:', error);
+
 			sendJson(response, 500, {
 				error: 'Unable to load users.'
 			});
@@ -161,6 +182,7 @@ const server = http.createServer(async (request, response) => {
 
 		return;
 	}
+	
 	if (request.url.startsWith('/api/admin/users/') && request.method === 'PUT') {
 		try {
 			const email = decodeURIComponent(
@@ -311,6 +333,58 @@ const server = http.createServer(async (request, response) => {
 
         return;
     }
+
+	if (request.url === '/api/admin/lists' && request.method === 'PUT') {
+		try {
+			const sessionId = getCookie(request, 'sessionId');
+
+			if (!sessionId) {
+				sendJson(response, 401, {
+					error: 'Not signed in.'
+				});
+				return;
+			}
+
+			const loggedInUser = sessions.get(sessionId);
+
+			if (!loggedInUser || loggedInUser.role !== 'admin') {
+				sendJson(response, 403, {
+					error: 'Admin access required.'
+				});
+				return;
+			}
+
+			const body = await readRequestBody(request);
+
+			const registeredUsers = Array.isArray(body.registeredUsers)
+				? body.registeredUsers
+				: [];
+
+			const waitlistUsers = Array.isArray(body.waitlistUsers)
+				? body.waitlistUsers
+				: [];
+
+			const currentLists = await readLists();
+
+			await writeLists({
+				...currentLists,
+				'registered-users': registeredUsers,
+				'waitlist-users': waitlistUsers
+			});
+
+			sendJson(response, 200, {
+				message: 'Lists updated successfully.'
+			});
+		} catch (error) {
+			console.error('Failed to update lists:', error);
+
+			sendJson(response, 500, {
+				error: 'Unable to update lists.'
+			});
+		}
+
+		return;
+	}
 
 	if (request.url === '/api/guest' && request.method === 'POST') {
 		try {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import GuestRegistrationModal from '../Components/GuestRegistrationModal';
 import { useNavigate } from 'react-router-dom';
+import GuestRegistrationModal from '../Components/GuestRegistrationModal';
+import EditListsModal from '../Components/EditListsModal';
 
 function SignedInListsPage({
 	signedInUser,
@@ -14,6 +15,14 @@ function SignedInListsPage({
 }) {
 
     const [showGuestModal, setShowGuestModal] = useState(false);
+    const [showEditListsModal, setShowEditListsModal] = useState(false);
+    const [registered, setRegistered] = useState(
+        playerLists.registeredUsers
+    );
+
+    const [waitlist, setWaitlist] = useState(
+        playerLists.waitlistUsers
+    );
     const [emailOptIn, setEmailOptIn] = useState(
         signedInUser?.emailOptIn ?? true
     );
@@ -224,6 +233,21 @@ function SignedInListsPage({
             </div>
             <div className="dashboard-info">
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
+                {signedInUser?.role === 'admin' && (
+                    <button
+                        type="button"
+                        className="register-button view-toggle-button active"
+                        onClick={() => setShowEditListsModal(true)}
+                    >
+                        Edit Lists
+                    </button>
+                )}
+                {showEditListsModal && (
+                    <EditListsModal
+                        playerLists={playerLists}
+                        onClose={() => setShowEditListsModal(false)}
+                />
+                )}
             </div>
             <div className="email-preferences">
                 <label>

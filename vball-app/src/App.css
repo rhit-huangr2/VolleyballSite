@@ -269,6 +269,71 @@
   gap: 20px;
 }
 
+.edit-lists-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.edit-list-section {
+  flex: 1;
+  min-width: 0;
+  height: 500px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 15px;
+  color: #000000;
+  overflow-y: auto;
+}
+
+.edit-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  color: #000000;
+
+  /* Keeps the header visible while scrolling */
+  position: sticky;
+  top: 0;
+  background: white;
+  padding-bottom: 10px;
+}
+
+.edit-list-header h3,
+.edit-list-header span {
+  color: #000000;
+}
+
+.edit-player-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.edit-player-item {
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  color: #000000;
+  cursor: grab;
+}
+
+.edit-player-item strong,
+.edit-player-item span {
+  color: #000000;
+}
+
+.edit-player-item:active {
+  cursor: grabbing;
+}
+
+.edit-player-item:hover {
+  opacity: 0.8;
+}
+
 .register-button {
   margin: 20px;
   justify-self: flex-end;
