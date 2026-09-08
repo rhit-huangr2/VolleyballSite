@@ -367,32 +367,11 @@ const server = http.createServer(async (request, response) => {
 			const registeredUsers = lists['registered-users'] || [];
 			const waitlistUsers = lists['waitlist-users'] || [];
 
-			// Find host
-			const registeredHost = registeredUsers.find(
-				user =>
-					user.email.trim().toLowerCase() === hostEmail
-			);
-
-			const waitlistHost = waitlistUsers.find(
-				user =>
-					user.email.trim().toLowerCase() === hostEmail
-			);
-
 			// Determine which list the guest belongs in
-			let targetList;
-
-			if (registeredHost) {
-				targetList = registeredUsers;
-			}
-			else if (waitlistHost) {
-				targetList = waitlistUsers;
-			}
-			else {
-				sendJson(response, 400, {
-					error: 'You must be registered before adding a guest.'
-				});
-				return;
-			}
+			const targetList =
+				registeredUsers.length >= MAX_REGISTERED_USERS
+					? waitlistUsers
+					: registeredUsers;
 
 			// Make sure the guest isn't already registered
 			const allPlayers = [
@@ -784,7 +763,8 @@ const server = http.createServer(async (request, response) => {
 	});
 });
 
-cron.schedule('* * * * *', async () => {
+// * * * * * for testing every minute
+cron.schedule('0 9 * * 6', async () => {
 	console.log('Running Saturday volleyball automation...');
 
 	try {
@@ -809,7 +789,7 @@ cron.schedule('* * * * *', async () => {
 	timezone: 'America/New_York'
 });
 
-cron.schedule('0 4 * * 1', async () => {
+cron.schedule('0 16 * * 1', async () => {
 	console.log('Running Monday volleyball automation...');
 
 	try {

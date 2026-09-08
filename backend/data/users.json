@@ -17,7 +17,7 @@
       "emailOptIn": false
     },
     {
-      "name": "Ava Patel",
+      "name": "edited Patel",
       "email": "ava.patel@example.com",
       "password": "test",
       "rating": 4,
@@ -211,6 +211,14 @@
     {
       "name": "7ryanhuang",
       "email": "7ryanhuang@gmail.com",
+      "password": "test",
+      "rating": -1,
+      "role": "member",
+      "emailOptIn": true
+    },
+    {
+      "name": "test2",
+      "email": "test2@test.com",
       "password": "test",
       "rating": -1,
       "role": "member",

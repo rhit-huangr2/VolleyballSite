@@ -189,10 +189,29 @@
       "email": "test@test.com",
       "password": "test",
       "rating": -1
+    },
+    {
+      "name": "guest guest",
+      "email": "guest@example.com",
+      "guestOf": "test@test.com",
+      "experienceLevel": "beginner"
     }
   ],
-  "waitlist-users": [],
+  "waitlist-users": [
+    {
+      "name": "test2",
+      "email": "test2@test.com",
+      "password": "test",
+      "rating": -1
+    },
+    {
+      "name": "guest2 guest2",
+      "email": "guest2@example.com",
+      "guestOf": "test2@test.com",
+      "experienceLevel": "advanced"
+    }
+  ],
   "email-metadata": {
-    "registration-message-id": "<da03f3b3-f610-82fd-eb88-df5f174cdd68@gmail.com>"
+    "registration-message-id": "<7cc623d8-cc6c-6e61-8fbc-2a7887e2ea40@gmail.com>"
   }
 }
