@@ -12,7 +12,6 @@
 - Matt's Suggestions
     - might be good to add a database
     - refresh the lists (not the whole page)
-    - fix the cursor appearing on text
     - player metrics (track how many times a user has attended)
 
 # Volleyball Website for CEMC
