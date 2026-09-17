@@ -19,7 +19,6 @@ const transporter = nodemailer.createTransport({
 });
 
 async function sendEmail(
-    to,
     subject,
     html,
     bcc,
@@ -28,19 +27,21 @@ async function sendEmail(
 ) {
     return transporter.sendMail({
         from: process.env.EMAIL_USER,
-        to,
         bcc,
         subject,
         html,
-        inReplyTo,
-        references
+        headers: {
+            'In-Reply-To': inReplyTo,
+            'References': references
+        }
     });
 }
 
 async function sendEmailToOptedInUsers(
     users,
     emailTemplate,
-    inReplyTo = null
+    inReplyTo = null,
+    references = null
 ) {
     const recipients = users.filter(
         user => user.emailOptIn === true
@@ -56,12 +57,11 @@ async function sendEmailToOptedInUsers(
     const email = emailTemplate();
 
     const info = await sendEmail(
-        process.env.EMAIL_USER,
         email.subject,
         email.html,
         recipients.map(user => user.email),
         inReplyTo,
-        inReplyTo
+        references
     );
 
     console.log(`Sent email to ${recipients.length} users.`);

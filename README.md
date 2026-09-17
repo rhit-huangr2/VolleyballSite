@@ -1,9 +1,5 @@
 # IDEAS TO ADD
 - EMAILS
-    - Registration Open (complete)
-    - Cancelation (complete)
-    - Registered List full/ waitlist now open (implementation done, format needs work)
-        - check for bug with manually changed lists
     - Registration confirmation ???
     - Autobalanced teams ???
 
@@ -13,6 +9,11 @@
     - fix CSS
 - Basketball signups
 - rating system
+- Matt's Suggestions
+    - might be good to add a database
+    - refresh the lists (not the whole page)
+    - fix the cursor appearing on text
+    - player metrics (track how many times a user has attended)
 
 # Volleyball Website for CEMC
 

@@ -53,29 +53,6 @@ function getCookie(request, name) {
 		: null;
 }
 
-async function clearPlayerLists() {
-	const lists = await readLists();
-
-	lists['registered-users'] = [];
-	lists['waitlist-users'] = [];
-
-	await writeLists(lists);
-
-	console.log('Weekly player lists cleared.');
-}
-
-async function saveRegistrationMessageId(messageId) {
-	const lists = await readLists();
-
-	if (!lists['email-metadata']) {
-		lists['email-metadata'] = {};
-	}
-
-	lists['email-metadata']['registration-message-id'] = messageId;
-
-	await writeLists(lists);
-}
-
 async function readRequestBody(request) {
 	return new Promise((resolve, reject) => {
 		let body = '';
@@ -136,24 +113,26 @@ registrationEvents.on('registrationFull', async () => {
 			);
 			return;
 		}
-
+		
 		await sendEmailToOptedInUsers(
 			users,
 			registrationFullEmail,
+			registrationMessageId,
 			registrationMessageId
 		);
-
+		
 		// Mark the email as sent.
 		if (!lists['email-metadata']) {
 			lists['email-metadata'] = {};
 		}
-
+		
 		lists['email-metadata'][
 			'registration-full-email-sent'
 		] = true;
-
+		
 		await writeLists(lists);
-
+		
+		console.log('FOR REGFULL: Registration Message-ID:', registrationMessageId);
 		console.log(
 			'Registration-full email sent and marked as sent.'
 		);
@@ -869,44 +848,21 @@ const server = http.createServer(async (request, response) => {
 	});
 });
 
+
+
+const {
+	runSaturdayAutomation
+} = require('./satAutomation');
+
 // * * * * * for testing every minute
+// 0 9 * * 6 for every Saturday at 9:00 AM
 cron.schedule('0 9 * * 6', async () => {
-	console.log('Running Saturday volleyball automation...');
-
-	try {
-		const users = await readUsers();
-
-		await clearPlayerLists();
-
-		const lists = await readLists();
-
-		if (!lists['email-metadata']) {
-			lists['email-metadata'] = {};
-		}
-
-		lists['email-metadata'][
-			'registration-full-email-sent'
-		] = false;
-
-		await writeLists(lists);
-
-		const emailInfo = await sendEmailToOptedInUsers(
-			users,
-			registrationOpenEmail
-		);
-		console.log('Registration email Message-ID:', emailInfo?.messageId);
-
-		if (emailInfo?.messageId) {
-			await saveRegistrationMessageId(emailInfo.messageId);
-		}
-		console.log('Saturday volleyball automation completed.');
-	} catch (error) {
-		console.error('Saturday automation failed:', error);
-	}
+    await runSaturdayAutomation();
 }, {
-	timezone: 'America/New_York'
+    timezone: 'America/New_York'
 });
 
+//may remove
 cron.schedule('0 16 * * 1', async () => {
 	console.log('Running Monday volleyball automation...');
 
@@ -915,7 +871,7 @@ cron.schedule('0 16 * * 1', async () => {
 		const lists = await readLists();
 		const registeredUsers = lists['registered-users'];
 
-		if (registeredUsers && registeredUsers.length < 10) {
+		if (registeredUsers && registeredUsers.length < 8) {
 			await sendEmailToOptedInUsers(
 				users,
 				volleyballCanceledEmail

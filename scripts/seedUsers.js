@@ -1,5 +1,5 @@
 const registeredUsers = [
-	{ name: 'test test', email: 'test.test@example.com', password: 'test', rating: 4, role: 'admin', emailOptIn: false },
+	{ name: 'admin.admin', email: 'admin.admin@example.com', password: 'test', rating: 4, role: 'admin', emailOptIn: false },
 	{ name: 'Ryan Huang', email: 'ryan.huang@example.com', password: 'test', rating: 5, role: 'member', emailOptIn: false },
 	{ name: '7Ryan', email: '7ryanhuang@gmail.com', password: 'test', rating: 2, role: 'admin', emailOptIn: false },
 	{ name: 'Jordan Lee', email: 'jordan.lee@example.com', password: 'test', rating: 3, role: 'member', emailOptIn: false },

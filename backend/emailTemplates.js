@@ -241,8 +241,15 @@ function volleyballCanceledEmail() {
 }
 
 function registrationFullEmail() {
+    const mondayDate = getNextMonday();
+    const date = new Date(`${mondayDate}, ${new Date().getFullYear()}`);
+
+    const mondayShortDate =
+        `${String(date.getMonth() + 1).padStart(2, '0')}/` +
+        `${String(date.getDate()).padStart(2, '0')}`;
+
     return {
-        subject: 'CEMC Volleyball Registration Full',
+        subject: `PLEASE REPLY- Volleyball Monday ${mondayShortDate} @7PM`,
         html: `
             <div style = "font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;">
                 <p>Hello Everyone!</p>

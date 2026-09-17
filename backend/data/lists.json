@@ -1,6 +1,38 @@
 {
   "registered-users": [
     {
+      "name": "admin.admin",
+      "email": "admin.admin@example.com",
+      "password": "test",
+      "rating": 4,
+      "role": "admin",
+      "emailOptIn": false
+    },
+    {
+      "name": "Ryan Huang",
+      "email": "ryan.huang@example.com",
+      "password": "test",
+      "rating": 5,
+      "role": "member",
+      "emailOptIn": false
+    },
+    {
+      "name": "7Ryan",
+      "email": "7ryanhuang@gmail.com",
+      "password": "test",
+      "rating": 2,
+      "role": "admin",
+      "emailOptIn": false
+    },
+    {
+      "name": "Jordan Lee",
+      "email": "jordan.lee@example.com",
+      "password": "test",
+      "rating": 3,
+      "role": "member",
+      "emailOptIn": false
+    },
+    {
       "name": "Mia Chen",
       "email": "mia.chen@example.com",
       "password": "test",
@@ -13,6 +45,14 @@
       "email": "ethan.brooks@example.com",
       "password": "test",
       "rating": 4,
+      "role": "member",
+      "emailOptIn": false
+    },
+    {
+      "name": "Sophia Kim",
+      "email": "sophia.kim@example.com",
+      "password": "test",
+      "rating": 5,
       "role": "member",
       "emailOptIn": false
     },
@@ -145,76 +185,15 @@
       "emailOptIn": false
     },
     {
-      "name": "guest guest",
-      "email": "guest@example.com",
-      "guestOf": "test@test.com",
-      "experienceLevel": "beginner"
-    },
-    {
-      "name": "Jordan Lee",
-      "email": "jordan.lee@example.com",
-      "password": "test",
-      "rating": 3,
-      "role": "member",
-      "emailOptIn": false
-    },
-    {
-      "name": "test test",
-      "email": "test.test@example.com",
-      "password": "test",
-      "rating": 4,
-      "role": "admin",
-      "emailOptIn": false
-    },
-    {
-      "name": "test2",
-      "email": "test2@test.com",
-      "password": "test",
-      "rating": -1
-    },
-    {
-      "name": "guest2 guest2",
-      "email": "guest2@example.com",
-      "guestOf": "test2@test.com",
-      "experienceLevel": "advanced"
-    },
-    {
-      "name": "7Ryan",
-      "email": "7ryanhuang@gmail.com",
-      "password": "test",
-      "rating": 2,
-      "role": "admin",
-      "emailOptIn": false
-    }
-  ],
-  "waitlist-users": [
-    {
-      "name": "Sophia Kim",
-      "email": "sophia.kim@example.com",
-      "password": "test",
-      "rating": 5,
-      "role": "member",
-      "emailOptIn": false
-    },
-    {
-      "name": "Ryan Huang",
-      "email": "ryan.huang@example.com",
-      "password": "test",
-      "rating": 5,
-      "role": "member",
-      "emailOptIn": false
-    },
-    {
       "name": "test",
       "email": "test@test.com",
       "password": "test",
-      "rating": -1,
-      "role": "admin",
-      "emailOptIn": true
+      "rating": -1
     }
   ],
+  "waitlist-users": [],
   "email-metadata": {
-    "registration-message-id": "<7cc623d8-cc6c-6e61-8fbc-2a7887e2ea40@gmail.com>",
-    "registration-full-email-sent": false
+    "registration-message-id": "<db1de599-95b0-d081-5f27-369a250558ae@gmail.com>",
+    "registration-full-email-sent": true
   }
 }

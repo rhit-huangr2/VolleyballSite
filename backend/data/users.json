@@ -6,10 +6,10 @@
       "password": "admin",
       "rating": -1,
       "role": "admin",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
-      "name": "Ryan Huang",
+      "name": "Ryan Huang (Modified)",
       "email": "ryan.huang@example.com",
       "password": "test",
       "rating": "4",
@@ -206,7 +206,7 @@
       "password": "test",
       "rating": -1,
       "role": "admin",
-      "emailOptIn": true
+      "emailOptIn": false
     },
     {
       "name": "7ryanhuang",
@@ -222,7 +222,15 @@
       "password": "test",
       "rating": -1,
       "role": "member",
-      "emailOptIn": true
+      "emailOptIn": false
+    },
+    {
+      "name": "Matt Wing",
+      "email": "Matt.wing@example.com",
+      "password": "test",
+      "rating": -1,
+      "role": "member",
+      "emailOptIn": false
     }
   ]
 }
