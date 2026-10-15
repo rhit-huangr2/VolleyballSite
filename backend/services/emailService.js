@@ -6,7 +6,7 @@ const {
     registrationOpenEmail,
     waitlistEmail,
     promotionEmail
-} = require('./emailTemplates');
+} = require('../emailTemplates');
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',

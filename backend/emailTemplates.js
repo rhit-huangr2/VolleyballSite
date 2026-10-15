@@ -244,7 +244,7 @@ function registrationFullEmail() {
     return {
         subject: 'CEMC Volleyball Registration Full',
         html: `
-            < div style = "font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;" >
+            <div style = "font-family: Arial, sans-serif; font-size: 14.67px; line-height: 1.656; color: #000000;">
                 <p>Hey Everyone!!</p>
 
                 <p>
