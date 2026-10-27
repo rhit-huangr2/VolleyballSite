@@ -16,9 +16,11 @@ const {
 	deleteListEntry
 } = require('./data/jsonCrud');
 
+const { listService } = require('./services/serviceFactory');
+
 const {
 	sendEmailToOptedInUsers,
-} = require('./emailService'); 
+} = require('./services/emailService'); 
 
 const {
 	registrationOpenEmail,
@@ -286,6 +288,25 @@ const server = http.createServer(async (request, response) => {
 	
 	if (request.url === '/api/health' && request.method === 'GET') {
 		sendJson(response, 200, { ok: true });
+		return;
+	}
+
+	if (
+		request.url === '/api/lists-db-test' &&
+		request.method === 'GET'
+	) {
+		try {
+			const lists = await listService.getLists();
+
+			sendJson(response, 200, lists);
+		} catch (error) {
+			console.error('PostgreSQL list test failed:', error);
+
+			sendJson(response, 500, {
+				error: 'Unable to load PostgreSQL player lists.'
+			});
+		}
+
 		return;
 	}
 

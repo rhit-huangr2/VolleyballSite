@@ -39,6 +39,18 @@ class PostgresUserRepository extends UserRepository {
         return this.mapUser(result.rows[0]);
     }
 
+    async findByEmail(email) {
+        const result = await pool.query(
+            `SELECT *
+             FROM users
+             WHERE LOWER(email) = LOWER($1)
+             LIMIT 1`,
+            [email.trim()]
+        );
+
+        return this.mapUser(result.rows[0]);
+    }
+
     async create(user) {
         const result = await pool.query(
             `INSERT INTO users (

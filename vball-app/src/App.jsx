@@ -51,8 +51,13 @@ function App() {
     }
   }
 
-  async function refreshPlayerLists() {
-    const response = await fetch('/api/lists');
+
+  async function refreshPlayerLists(usePostgres = false) {
+    const endpoint = usePostgres
+      ? '/api/lists-db-test'
+      : '/api/lists';
+
+    const response = await fetch(endpoint);
     const result = await response.json();
 
     if (!response.ok) {
@@ -64,6 +69,7 @@ function App() {
       waitlistUsers: result['waitlist-users']
     });
   }
+
 
   useEffect(() => {
     async function checkSession() {

@@ -7,6 +7,10 @@ class UserRepository {
         throw new Error('findById() not implemented');
     }
 
+    async findByEmail(email) {
+        throw new Error('findByEmail() must be implemented');
+    }
+
     async create(user) {
         throw new Error('create() not implemented');
     }
