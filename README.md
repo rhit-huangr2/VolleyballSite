@@ -6,6 +6,7 @@
         - check for bug with manually changed lists
     - Registration confirmation ???
     - Autobalanced teams ???
+    - BUG WHERE EDIT LISTS REMOVES WAITLIST
 
 - Admin should be able to manually change lists (complete)
     - fix CSS

@@ -18,11 +18,17 @@ function AdminMenu() {
     async function loadUsers() {
         try {
             const response = await fetch('/api/admin/users');
+
+            if (!response.ok) {
+                throw new Error(`Failed to load users: ${response.status}`);
+            }
+
             const data = await response.json();
 
             setUsers(data);
         } catch (error) {
             console.error('Failed to load users:', error);
+            setUsers([]);
         }
     }
 

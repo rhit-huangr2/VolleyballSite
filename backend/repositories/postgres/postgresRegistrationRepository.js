@@ -225,6 +225,78 @@ class PostgresRegistrationRepository extends RegistrationRepository {
         }
     }    
 
+    async withdrawUser(userId) {
+        const client = await pool.connect();
+
+        try {
+            await client.query('BEGIN');
+
+            // Prevent concurrent changes to registration lists.
+            await client.query(
+                'LOCK TABLE registrations IN EXCLUSIVE MODE'
+            );
+
+            // Find the user's current registration.
+            const existing = await client.query(
+                `SELECT status
+                 FROM registrations
+                 WHERE user_id = $1`,
+                [userId]
+            );
+
+            if (existing.rowCount === 0) {
+                await client.query('ROLLBACK');
+                return false;
+            }
+
+            const previousStatus = existing.rows[0].status;
+
+            // Remove the user.
+            await client.query(
+                'DELETE FROM registrations WHERE user_id = $1',
+                [userId]
+            );
+
+            // Only promote someone if the user had a registered spot.
+            if (previousStatus === 'registered') {
+                const nextWaitlisted = await client.query(
+                    `SELECT id
+                     FROM registrations
+                     WHERE status = 'waitlisted'
+                     ORDER BY position ASC
+                     LIMIT 1`
+                );
+
+                if (nextWaitlisted.rowCount > 0) {
+                    const nextPosition = await client.query(
+                        `SELECT COALESCE(MAX(position), -1) + 1 AS position
+                         FROM registrations
+                         WHERE status = 'registered'`
+                    );
+
+                    await client.query(
+                        `UPDATE registrations
+                         SET status = 'registered', position = $1
+                         WHERE id = $2`,
+                        [
+                            Number(nextPosition.rows[0].position),
+                            nextWaitlisted.rows[0].id
+                        ]
+                    );
+                }
+            }
+
+            await client.query('COMMIT');
+            return true;
+
+        } catch (error) {
+            await client.query('ROLLBACK');
+            throw error;
+        } finally {
+            client.release();
+        }
+    }
+
     async clearAll() {
         const result = await pool.query(
             'DELETE FROM registrations'
@@ -264,7 +336,10 @@ class PostgresRegistrationRepository extends RegistrationRepository {
 
             if (existing.rowCount > 0) {
                 await client.query('COMMIT');
-                return existing.rows[0];
+                return {
+                    ...existing.rows[0],
+                    alreadyRegistered: true
+                };
             }
 
             // Count all registered players, including guests.
@@ -275,6 +350,7 @@ class PostgresRegistrationRepository extends RegistrationRepository {
             );
 
             const registeredCount = Number(countResult.rows[0].count);
+            const wasFull = registeredCount >= maxRegistered;
 
             const status = registeredCount < maxRegistered
                 ? 'registered'
@@ -298,10 +374,19 @@ class PostgresRegistrationRepository extends RegistrationRepository {
             );
 
             await client.query('COMMIT');
-            return result.rows[0];
+
+            return {
+                ...result.rows[0],
+                wasFull,
+                isNowFull:
+                    status === 'registered' &&
+                    registeredCount + 1 >= maxRegistered
+            };
+
         } catch (error) {
             await client.query('ROLLBACK');
             throw error;
+
         } finally {
             client.release();
         }
@@ -315,6 +400,7 @@ class PostgresRegistrationRepository extends RegistrationRepository {
         return this.registerPerson(guestId, 'guest', maxRegistered);
     }
 
+    
 }
 
 module.exports = PostgresRegistrationRepository;

@@ -1,199 +1,273 @@
 {
   "registered-users": [
     {
+      "id": "29",
       "name": "test test",
       "email": "test.test@example.com",
-      "password": "test",
       "rating": 4,
       "role": "admin",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 0
     },
     {
+      "id": "2",
       "name": "Ryan Huang",
       "email": "ryan.huang@example.com",
-      "password": "test",
-      "rating": 5,
-      "role": "member",
-      "emailOptIn": false
-    },
-    {
-      "name": "7Ryan",
-      "email": "7ryanhuang@gmail.com",
-      "password": "test",
-      "rating": 2,
+      "rating": 4,
       "role": "admin",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 1
     },
     {
+      "id": "27",
+      "name": "7ryanhuang",
+      "email": "7ryanhuang@gmail.com",
+      "rating": -1,
+      "role": "member",
+      "emailOptIn": true,
+      "isGuest": false,
+      "status": "registered",
+      "position": 2
+    },
+    {
+      "id": "4",
       "name": "Jordan Lee",
       "email": "jordan.lee@example.com",
-      "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 3
     },
     {
+      "id": "5",
       "name": "Mia Chen",
       "email": "mia.chen@example.com",
-      "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 4
     },
     {
+      "id": "7",
       "name": "Ethan Brooks",
       "email": "ethan.brooks@example.com",
-      "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 5
     },
     {
+      "id": "8",
       "name": "Sophia Kim",
       "email": "sophia.kim@example.com",
-      "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 6
     },
     {
+      "id": "9",
       "name": "Liam Carter",
       "email": "liam.carter@example.com",
-      "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 7
     },
     {
+      "id": "10",
       "name": "Isabella Nguyen",
       "email": "isabella.nguyen@example.com",
-      "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 8
     },
     {
+      "id": "11",
       "name": "Mason Rivera",
       "email": "mason.rivera@example.com",
-      "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 9
     },
     {
+      "id": "12",
       "name": "Olivia Torres",
       "email": "olivia.torres@example.com",
-      "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 10
     },
     {
+      "id": "13",
       "name": "Lucas Bennett",
       "email": "lucas.bennett@example.com",
-      "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 11
     },
     {
+      "id": "14",
       "name": "Amelia Foster",
       "email": "amelia.foster@example.com",
-      "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 12
     },
     {
+      "id": "15",
       "name": "Benjamin Price",
       "email": "benjamin.price@example.com",
-      "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 13
     },
     {
+      "id": "16",
       "name": "Charlotte Gray",
       "email": "charlotte.gray@example.com",
-      "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 14
     },
     {
+      "id": "17",
       "name": "Henry Long",
       "email": "henry.long@example.com",
-      "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 15
     },
     {
+      "id": "18",
       "name": "Harper James",
       "email": "harper.james@example.com",
-      "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 16
     },
     {
+      "id": "19",
       "name": "Elijah Reed",
       "email": "elijah.reed@example.com",
-      "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 17
     },
     {
+      "id": "20",
       "name": "Evelyn Ward",
       "email": "evelyn.ward@example.com",
-      "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 18
     },
     {
+      "id": "21",
       "name": "James Cooper",
       "email": "james.cooper@example.com",
-      "password": "test",
       "rating": 3,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 19
     },
     {
+      "id": "22",
       "name": "Abigail Cox",
       "email": "abigail.cox@example.com",
-      "password": "test",
       "rating": 4,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 20
     },
     {
+      "id": "23",
       "name": "Alexander Diaz",
       "email": "alexander.diaz@example.com",
-      "password": "test",
       "rating": 2,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 21
     },
     {
+      "id": "24",
       "name": "Emily Powell",
       "email": "emily.powell@example.com",
-      "password": "test",
       "rating": 5,
       "role": "member",
-      "emailOptIn": false
+      "emailOptIn": false,
+      "isGuest": false,
+      "status": "registered",
+      "position": 22
     },
     {
+      "id": "30",
       "name": "guest2 guest2",
       "email": "guest2@example.com",
-      "guestOf": "test@test.com",
-      "experienceLevel": "beginner"
+      "rating": null,
+      "role": null,
+      "emailOptIn": null,
+      "isGuest": false,
+      "status": "registered",
+      "position": 23
     }
   ],
   "waitlist-users": [],
   "email-metadata": {
     "registration-message-id": "<7cc623d8-cc6c-6e61-8fbc-2a7887e2ea40@gmail.com>",
-    "registration-full-email-sent": false
+    "registration-full-email-sent": true
   }
 }

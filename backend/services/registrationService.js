@@ -20,6 +20,16 @@ class RegistrationService {
         );
     }
 
+    async withdrawUser(userId) {
+        const user = await this.userRepository.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        return this.registrationRepository.withdrawUser(userId);
+    }
+
     async registerGuest(guestId) {
         const guest = await this.guestRepository.findById(guestId);
 

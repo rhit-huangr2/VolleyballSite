@@ -14,12 +14,16 @@ const PostgresEmailMetadataRepository =
 const RegistrationService =
     require('./registrationService');
 
+const GuestService = require('./guestService');
+
 const ListService = require('./listService');
 
 const userRepository = new PostgresUserRepository();
 const guestRepository = new PostgresGuestRepository();
+
 const registrationRepository =
     new PostgresRegistrationRepository();
+
 const emailMetadataRepository =
     new PostgresEmailMetadataRepository();
 
@@ -27,6 +31,11 @@ const registrationService = new RegistrationService(
     registrationRepository,
     userRepository,
     guestRepository
+);
+
+const guestService = new GuestService(
+    guestRepository,
+    userRepository
 );
 
 const listService = new ListService(
@@ -40,5 +49,6 @@ module.exports = {
     registrationRepository,
     emailMetadataRepository,
     registrationService,
+    guestService,
     listService
 };

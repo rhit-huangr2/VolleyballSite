@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import SignedInListsPage from './Pages/SignedInListsPage';
 import './App.css';
 import AuthForm from './Components/AuthForm';
-import { Routes, Route } from 'react-router-dom';
+import { Navigate, Routes, Route } from 'react-router-dom';
 import AdminPage from './Pages/AdminPage';
 
 
@@ -52,6 +52,7 @@ function App() {
   }
 
 
+
   async function refreshPlayerLists(usePostgres = false) {
     const endpoint = usePostgres
       ? '/api/lists-db-test'
@@ -60,15 +61,21 @@ function App() {
     const response = await fetch(endpoint);
     const result = await response.json();
 
+    // console.log('Endpoint:', endpoint);
+    // console.log('API response:', result);
+    // console.log('Registered users:', result['registered-users']);
+    // console.log('Waitlisted users:', result['waitlist-users']);
+
     if (!response.ok) {
       throw new Error(result.error || 'Unable to load player lists.');
     }
 
     setPlayerLists({
-      registeredUsers: result['registered-users'],
-      waitlistUsers: result['waitlist-users']
+      registeredUsers: result['registered-users'] || [],
+      waitlistUsers: result['waitlist-users'] || []
     });
   }
+
 
 
   useEffect(() => {
@@ -235,6 +242,22 @@ function App() {
     return (
       <>
         <h1 className="eyebrow">CEMC Volleyball</h1>
+
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await refreshPlayerLists(true);
+              alert('PostgreSQL lists loaded successfully.');
+            } catch (error) {
+              console.error('PostgreSQL list test failed:', error);
+              alert('Failed to load PostgreSQL lists.');
+            }
+          }}
+        >
+          Test PostgreSQL Lists
+        </button>
+
       </>
     );
   }
@@ -287,7 +310,9 @@ function App() {
           isRegistered={isRegistered}
           checkRegistration={checkRegistration}
           setIsRegistered={setIsRegistered}
+          onRefreshPostgresLists={() => refreshPlayerLists(true)}
         />
+        
       );
     }
 
@@ -338,9 +363,11 @@ function App() {
           <Route
             path="/admin"
             element={
-              <AdminPage
-                signedInUser={signedInUser}
-              />
+              signedInUser?.role === 'admin' ? (
+                <AdminPage signedInUser={signedInUser} />
+              ) : (
+                <Navigate to="/" replace />
+              )
             }
           />
 

@@ -16,34 +16,56 @@ function EditListsModal({ playerLists, onClose }) {
     const [draggedPlayer, setDraggedPlayer] = useState(null);
     const [saving, setSaving] = useState(false);
 
+
     useEffect(() => {
         async function loadUsers() {
             try {
-                const response = await fetch('/api/admin/users');
+                const [usersResponse, guestsResponse] = await Promise.all([
+                    fetch('/api/admin/users'),
+                    fetch('/api/admin/guests')
+                ]);
 
-                if (!response.ok) {
-                    throw new Error('Unable to load users.');
+                if (!usersResponse.ok || !guestsResponse.ok) {
+                    throw new Error('Unable to load PostgreSQL users and guests.');
                 }
 
-                const users = await response.json();
+                const users = await usersResponse.json();
+                const guests = await guestsResponse.json();
 
-                // Keep a copy of the original users list
-                setAllUsers([...users]);
+                const allPeople = [
+                    ...users.map(user => ({
+                        ...user,
+                        isGuest: false
+                    })),
+                    ...guests.map(guest => {
+                        const host = users.find(
+                            user => String(user.id) === String(guest.guestOfUserId)
+                        );
+
+                        return {
+                            ...guest,
+                            isGuest: true,
+                            guestOf: host ? host.name : 'Unknown'
+                        };
+                    })
+                ];
+
+                setAllUsers(allPeople);
 
                 const registeredEmails = new Set(
                     playerLists.registeredUsers.map(
-                        user => user.email.toLowerCase()
+                        person => person.email.toLowerCase()
                     )
                 );
 
                 const waitlistEmails = new Set(
                     playerLists.waitlistUsers.map(
-                        user => user.email.toLowerCase()
+                        person => person.email.toLowerCase()
                     )
                 );
 
-                const unregistered = users.filter(user => {
-                    const email = user.email.toLowerCase();
+                const unregistered = allPeople.filter(person => {
+                    const email = person.email.toLowerCase();
 
                     return (
                         !registeredEmails.has(email) &&
@@ -51,14 +73,10 @@ function EditListsModal({ playerLists, onClose }) {
                     );
                 });
 
-                setUnregisteredUsers([...unregistered]);
+                setUnregisteredUsers(unregistered);
 
             } catch (error) {
-                console.error(
-                    'Failed to load users:',
-                    error
-                );
-
+                console.error('Failed to load PostgreSQL users:', error);
                 alert('Unable to load users.');
             }
         }
@@ -151,11 +169,11 @@ function EditListsModal({ playerLists, onClose }) {
     }
 
     function renderPlayer(player, sourceList) {
-        const isGuest = player.guestOf !== undefined;
+        const isGuest = player.isGuest === true;
 
         return (
             <li
-                key={player.email}
+                key={`${isGuest ? 'guest' : 'user'}-${player.id}`}
                 className={
                     isGuest
                         ? 'edit-player-item guest-item'
@@ -163,23 +181,14 @@ function EditListsModal({ playerLists, onClose }) {
                 }
                 draggable
                 onDragStart={(event) =>
-                    handleDragStart(
-                        event,
-                        player,
-                        sourceList
-                    )
+                    handleDragStart(event, player, sourceList)
                 }
             >
                 <div>
                     <strong>
                         {player.name}
-                        {isGuest &&
-                            ` (Guest of ${player.guestOf})`}
+                        {isGuest && ` (Guest of ${player.guestOf || 'Unknown'})`}
                     </strong>
-
-                    {/* <span>
-                        {player.email}
-                    </span> */}
                 </div>
             </li>
         );
@@ -187,10 +196,30 @@ function EditListsModal({ playerLists, onClose }) {
 
     async function handleSave() {
         try {
+            // Combine both lists so we can validate every player.
+            const allPeople = [...registeredUsers, ...waitlistUsers];
+
+            // Check for invalid IDs or missing member/guest identification.
+            const invalidPeople = allPeople.filter(person =>
+                !Number.isSafeInteger(Number(person.id)) ||
+                Number(person.id) <= 0 ||
+                typeof person.isGuest !== 'boolean'
+            );
+
+            // Check that the same person isn't in both lists.
+            const personIds = allPeople.map(person =>
+                `${person.isGuest ? 'guest' : 'user'}:${person.id}`
+            );
+            const hasDuplicates =
+                new Set(personIds).size !== personIds.length;
+            if (invalidPeople.length > 0 || hasDuplicates) {
+                alert('Invalid or duplicate player data. Changes were not saved.');
+                return;
+            }
+
             setSaving(true);
 
-            const response = await fetch('/api/admin/lists', {
-                method: 'PUT',
+            const response = await fetch('/api/admin/lists-db-test', {                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -199,6 +228,8 @@ function EditListsModal({ playerLists, onClose }) {
                     waitlistUsers
                 })
             });
+
+            console.log('Response status:', response.status);
 
             const data = await response.json();
 
