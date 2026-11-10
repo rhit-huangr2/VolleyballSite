@@ -556,7 +556,7 @@ const server = http.createServer(async (request, response) => {
 			const name = String(body.name || '').trim();
 			const email = String(body.email || '').trim();
 			const password = String(body.password || '');
-			const rating = -1; // Default rating for new users
+			const rating = 1; // Default rating for new users
 			const role = 'member'; // Default role for new users
 			const emailOptIn = true; // Default email opt-in for new users
 
@@ -591,7 +591,8 @@ const server = http.createServer(async (request, response) => {
 				message: 'Account created successfully.',
 				user,
 			});
-		} catch (error) {
+		} 
+		catch (error) {
 			sendJson(response, 400, {
 				error: 'Invalid registration payload.'
 			});

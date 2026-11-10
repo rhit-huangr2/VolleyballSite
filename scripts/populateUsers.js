@@ -2,18 +2,36 @@
 const pool = require('../backend/db/pool');
 const { hashPassword } = require('../backend/utils/passwordUtils');
 
-const sampleUsers = Array.from({ length: 30 }, (_, index) => {
-    const number = String(index + 1).padStart(2, '0');
-
-    return {
-        name: `Test User ${number}`,
-        email: `testuser${number}@example.com`,
+const sampleUsers = [
+    {
+        name: 'test',
+        email: 'test@test.com',
         password: 'test',
-        rating: (index % 10) + 1,
-        role: index === 0 ? 'admin' : 'member',
+        rating: 1,
+        role: 'admin',
         emailOptIn: true
-    };
-});
+    },
+    {
+        name: 'Ryan Huang Test',
+        email: '7ryanhuang@gmail.com',
+        password: 'test',
+        rating: 1,
+        role: 'admin',
+        emailOptIn: true
+    },
+    ...Array.from({ length: 30 }, (_, index) => {
+        const number = String(index + 1).padStart(2, '0');
+
+        return {
+            name: `Test User ${number}`,
+            email: `testuser${number}@example.com`,
+            password: 'test',
+            rating: (index % 10) + 1,
+            role: index === 0 ? 'admin' : 'member',
+            emailOptIn: false
+        };
+    })
+];
 
 async function populateUsers() {
     try {
