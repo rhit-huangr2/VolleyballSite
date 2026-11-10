@@ -3,22 +3,19 @@ require('dotenv').config();
 const http = require('http');
 const crypto = require('crypto');
 const cron = require('node-cron');
-const {
-	readUsers,
-	writeUsers,
-	readLists,
-	writeLists,
-	createListEntry,
-	createUser,
-	updateUser,
-	deleteUser,
-	updateListEntry,
-	deleteListEntry
-} = require('./data/jsonCrud');
+
+const { 
+	listService, 
+	userRepository,	
+	guestRepository, 
+	registrationRepository,
+	registrationService,
+	guestService
+} = require('./services/serviceFactory');
 
 const {
 	sendEmailToOptedInUsers,
-} = require('./emailService'); 
+} = require('./services/emailService'); 
 
 const {
 	registrationOpenEmail,
@@ -28,7 +25,14 @@ const {
 	waitlistEmail,
 	promotionEmail
 } = require('./emailTemplates');
+
 const registrationEvents = require('./registrationEvents');
+
+const {
+	hashPassword,
+	verifyPassword
+} = require('./utils/passwordUtils'); 
+
 const sessions = new Map();
 const port = process.env.PORT || 5001;
 
@@ -51,6 +55,19 @@ function getCookie(request, name) {
 	return cookie
 		? decodeURIComponent(cookie.split('=')[1])
 		: null;
+}
+
+async function clearPlayerLists() {
+	await registrationRepository.clearAll();
+
+	console.log('Weekly player lists cleared.');
+}
+
+async function saveRegistrationMessageId(messageId) {
+	await emailMetadataRepository.set(
+		'registration-message-id',
+		messageId
+	);
 }
 
 async function readRequestBody(request) {
@@ -80,18 +97,13 @@ async function readRequestBody(request) {
 
 registrationEvents.on('registrationFull', async () => {
 	try {
-		const lists = await readLists();
+		console.log('*** registrationFull EVENT RECEIVED ***');
 
-		console.log(
-			'*** registrationFull EVENT RECEIVED ***'
-		);
-
-		// Check if the full-registration email
+		// Check whether the full-registration email
 		// has already been sent this week.
-		const alreadySent =
-			lists['email-metadata']?.[
+		const alreadySent = await emailMetadataRepository.get(
 			'registration-full-email-sent'
-			];
+		);
 
 		if (alreadySent) {
 			console.log(
@@ -100,17 +112,14 @@ registrationEvents.on('registrationFull', async () => {
 			return;
 		}
 
-		const users = await readUsers();
+		const users = await userRepository.findAll();
 
-		const registrationMessageId =
-			lists['email-metadata']?.[
+		const registrationMessageId = await emailMetadataRepository.get(
 			'registration-message-id'
-			];
+		);
 
 		if (!registrationMessageId) {
-			console.error(
-				'No registration-open Message-ID found.'
-			);
+			console.error('No registration-open Message-ID found.');
 			return;
 		}
 		
@@ -120,19 +129,13 @@ registrationEvents.on('registrationFull', async () => {
 			registrationMessageId,
 			registrationMessageId
 		);
-		
-		// Mark the email as sent.
-		if (!lists['email-metadata']) {
-			lists['email-metadata'] = {};
-		}
-		
-		lists['email-metadata'][
-			'registration-full-email-sent'
-		] = true;
-		
-		await writeLists(lists);
-		
-		console.log('FOR REGFULL: Registration Message-ID:', registrationMessageId);
+
+		// Mark the email as sent in PostgreSQL.
+		await emailMetadataRepository.set(
+			'registration-full-email-sent',
+			true
+		);
+
 		console.log(
 			'Registration-full email sent and marked as sent.'
 		);
@@ -159,6 +162,44 @@ const server = http.createServer(async (request, response) => {
 		return;
 	}
 
+	if (
+		request.method === 'GET' &&
+		request.url.split('?')[0] === '/api/admin/guests'
+	) {
+		try {
+			const sessionId = getCookie(request, 'sessionId');
+
+			if (!sessionId) {
+				sendJson(response, 401, {
+					error: 'Not signed in.'
+				});
+				return;
+			}
+
+			const loggedInUser = sessions.get(sessionId);
+
+			if (!loggedInUser || loggedInUser.role !== 'admin') {
+				sendJson(response, 403, {
+					error: 'Admin access required.'
+				});
+				return;
+			}
+
+			const guests = await guestRepository.findAll();
+
+			sendJson(response, 200, guests);
+
+		} catch (error) {
+			console.error('Failed to load guests:', error);
+
+			sendJson(response, 500, {
+				error: 'Unable to load guests.'
+			});
+		}
+
+		return;
+	}
+
 	if (request.url === '/api/admin/users' && request.method === 'GET') {
 		try {
 			const sessionId = getCookie(request, 'sessionId');
@@ -179,7 +220,7 @@ const server = http.createServer(async (request, response) => {
 				return;
 			}
 
-			const users = await readUsers();
+			const users = await userRepository.findAll();
 
 			sendJson(response, 200, users);
 
@@ -195,6 +236,16 @@ const server = http.createServer(async (request, response) => {
 	}
 
 	if (request.url.startsWith('/api/admin/users/') && request.method === 'PUT') {
+		const sessionId = getCookie(request, 'sessionId');
+		const loggedInUser = sessions.get(sessionId);
+
+		if (!loggedInUser || loggedInUser.role !== 'admin') {
+			sendJson(response, 403, {
+				error: 'Unauthorized'
+			});
+			return;
+		}
+
 		try {
 			const email = decodeURIComponent(
 				request.url.split('/api/admin/users/')[1]
@@ -204,10 +255,7 @@ const server = http.createServer(async (request, response) => {
 
 			console.log("updates:", updates);
 
-			const data = await readUsers();
-			const user = data.find(
-				u => u.email === email
-			);
+			const user = await userRepository.findByEmail(email);
 
 			if (!user) {
 				sendJson(response, 404, {
@@ -216,13 +264,11 @@ const server = http.createServer(async (request, response) => {
 				return;
 			}
 
-			Object.assign(user, updates);
-
-			await writeUsers(data);
+			const updatedUser = await userRepository.update(user.id, updates);
 
 			sendJson(response, 200, {
 				message: "User updated",
-				user
+				user: updatedUser
 			});
 
 		} catch (error) {
@@ -241,7 +287,7 @@ const server = http.createServer(async (request, response) => {
 		request.method === 'POST'
 	) {
 		try {
-			const users = await readUsers();
+			const users = await userRepository.findAll();
 
 			await sendEmailToOptedInUsers(
 				users,
@@ -270,9 +316,12 @@ const server = http.createServer(async (request, response) => {
 
 	if (request.url === '/api/lists' && request.method === 'GET') {
 		try {
-			const lists = await readLists();
+			const lists = await listService.getLists();
+
 			sendJson(response, 200, lists);
 		} catch (error) {
+			console.error('Failed to load PostgreSQL player lists:', error);
+
 			sendJson(response, 500, {
 				error: 'Unable to load player lists.'
 			});
@@ -281,69 +330,48 @@ const server = http.createServer(async (request, response) => {
 		return;
 	}
 
-    if (request.url === '/api/lists' && request.method === 'POST') {
-        try {
-            const body = await readRequestBody(request);
-            const name = String(body.name || '').trim();
-            const email = String(body.email || '').trim();
-            const password = String(body.password || '');
-            const rating = Number(body.rating || -1);
+	if (request.url === '/api/lists' && request.method === 'POST') {
+		try {
+			const sessionId = getCookie(request, 'sessionId');
+			const loggedInUser = sessions.get(sessionId);
 
-			const lists = await readLists();
+			if (!loggedInUser) {
+				sendJson(response, 401, {
+					error: 'You must be signed in to register.'
+				});
+				return;
+			}
 
-			const registeredUsers = lists['registered-users'] || [];
-			const waitlistUsers = lists['waitlist-users'] || [];
+			const result = await registrationService.registerUser(
+				loggedInUser.id
+			);
 
-			const wasFull = registeredUsers.length >= MAX_REGISTERED_USERS;
-
-			const placementListName =
-				registeredUsers.length >= MAX_REGISTERED_USERS
-					? 'waitlist-users'
-					: 'registered-users';
-
-			const duplicateEmail =
-				registeredUsers.find((player) => player.email === email) ||
-				waitlistUsers.find((player) => player.email === email);
-
-			if (duplicateEmail) {
+			if (result.alreadyRegistered) {
 				sendJson(response, 409, {
 					error: 'You are already registered.'
 				});
 				return;
 			}
 
-			await createListEntry(
-				placementListName,
-				{ name, email, password, rating }
-			);
-
-			// Only check for "full" if this user was actually added
-			// to the registered list.
-			if (placementListName === 'registered-users') {
-				const updatedLists = await readLists();
-				const updatedRegisteredUsers =
-					updatedLists['registered-users'] || [];
-
-				const isNowFull =
-					updatedRegisteredUsers.length >= MAX_REGISTERED_USERS;
-
-				if (!wasFull && isNowFull) {
-					registrationEvents.emit('registrationFull');
-					console.log('Registration is now full. Event emitted.');
-				}
+			if (!result.wasFull && result.isNowFull) {
+				registrationEvents.emit('registrationFull');
+				console.log('Registration is now full. Event emitted.');
 			}
 
 			sendJson(response, 201, {
-				message: 'List entry created successfully.'
+				message: 'Registration successful.',
+				status: result.status
 			});
-        } catch (error) {
-            sendJson(response, 500, {
-                error: 'Unable to create list entry.'
-            });
-        }
+		} catch (error) {
+			console.error('Error registering user:', error);
 
-        return;
-    }
+			sendJson(response, 500, {
+				error: 'Unable to register user.'
+			});
+		}
+
+		return;
+	}
 
 	if (request.url === '/api/admin/lists' && request.method === 'PUT') {
 		try {
@@ -375,22 +403,19 @@ const server = http.createServer(async (request, response) => {
 				? body.waitlistUsers
 				: [];
 
-			const currentLists = await readLists();
-
-			await writeLists({
-				...currentLists,
-				'registered-users': registeredUsers,
-				'waitlist-users': waitlistUsers
-			});
+			await registrationRepository.replaceAllLists(
+				registeredUsers,
+				waitlistUsers
+			);
 
 			sendJson(response, 200, {
-				message: 'Lists updated successfully.'
+				message: 'PostgreSQL lists updated successfully.'
 			});
 		} catch (error) {
-			console.error('Failed to update lists:', error);
+			console.error('Failed to update PostgreSQL lists:', error);
 
 			sendJson(response, 500, {
-				error: 'Unable to update lists.'
+				error: 'Unable to update PostgreSQL lists.'
 			});
 		}
 
@@ -399,108 +424,70 @@ const server = http.createServer(async (request, response) => {
 
 	if (request.url === '/api/guest' && request.method === 'POST') {
 		try {
-			// Get session ID from cookie
 			const sessionId = getCookie(request, 'sessionId');
 
 			if (!sessionId) {
-				sendJson(response, 401, {
-					error: 'Not signed in.'
-				});
+				sendJson(response, 401, { message: 'Not signed in.' });
 				return;
 			}
 
-			// Get logged-in user
 			const loggedInUser = sessions.get(sessionId);
 
 			if (!loggedInUser) {
-				sendJson(response, 401, {
-					error: 'Session expired or invalid.'
-				});
+				sendJson(response, 401, { message: 'Session expired.' });
 				return;
 			}
 
-			// Read guest information
 			const body = await readRequestBody(request);
 
 			const firstName = String(body.firstName || '').trim();
 			const lastName = String(body.lastName || '').trim();
 			const email = String(body.email || '').trim().toLowerCase();
-			const experienceLevel = String(
-				body.experienceLevel || ''
-			).trim();
+			const experienceLevel = String(body.experienceLevel || '').trim();
 
-			// Validate guest information
-			if (
-				!firstName ||
-				!lastName ||
-				!email ||
-				!experienceLevel
-			) {
+			if (!firstName || !lastName || !email || !experienceLevel) {
 				sendJson(response, 400, {
-					error: 'All guest fields are required.'
+					message: 'All guest fields are required.'
 				});
 				return;
 			}
 
-			const hostEmail = loggedInUser.email
-				.trim()
-				.toLowerCase();
-
-			// Load lists
-			const lists = await readLists();
-
-			const registeredUsers = lists['registered-users'] || [];
-			const waitlistUsers = lists['waitlist-users'] || [];
-
-			// Determine which list the guest belongs in
-			const targetList =
-				registeredUsers.length >= MAX_REGISTERED_USERS
-					? waitlistUsers
-					: registeredUsers;
-
-			// Make sure the guest isn't already registered
-			const allPlayers = [
-				...registeredUsers,
-				...waitlistUsers
-			];
-
-			const duplicate = allPlayers.find(
-				player =>
-					player.email &&
-					player.email.trim().toLowerCase() === email
-			);
-
-			if (duplicate) {
-				sendJson(response, 409, {
-					error: 'A player or guest with this email already exists.'
-				});
-				return;
-			}
-
-			// Create guest
-			const guest = {
+			// Create the guest in PostgreSQL.
+			const guest = await guestService.createGuest({
 				name: `${firstName} ${lastName}`,
-				email: email,
-				guestOf: hostEmail,
-				experienceLevel: experienceLevel
-			};
+				email,
+				registeredByEmail: loggedInUser.email,
+				experienceLevel
+			});
 
-			// Add guest to the same list as their host
-			targetList.push(guest);
-
-			// Save lists.json
-			await writeLists(lists);
+			// Register the guest or place them on the waitlist.
+			const registration = await registrationService.registerGuest(guest.id);
 
 			sendJson(response, 201, {
 				message: 'Guest successfully registered.',
-				guest
+				guest: {
+					name: guest.name,
+					email: guest.email,
+					guestOf: loggedInUser.email,
+					experienceLevel
+				},
+				status: registration.status
 			});
 
 		} catch (error) {
-			console.error('Guest registration error:', error);
+			console.error('Error registering guest:', error);
+
+			if (
+				error.message === 'This email is already in use' ||
+				error.message === 'Invalid experience level' ||
+				error.message === 'Registering member not found'
+			) {
+				sendJson(response, 400, { message: error.message });
+				return;
+			}
 
 			sendJson(response, 500, {
-				error: 'Unable to register guest.'
+				message: 'Unable to register guest.'
 			});
 		}
 
@@ -530,13 +517,7 @@ const server = http.createServer(async (request, response) => {
 				return;
 			}
 
-			const users = await readUsers();
-
-			const user = users.find(
-				user =>
-					user.email.toLowerCase() ===
-					loggedInUser.email.toLowerCase()
-			);
+			const user = await userRepository.findByEmail(loggedInUser.email);
 
 			if (!user) {
 				sendJson(response, 404, {
@@ -546,16 +527,16 @@ const server = http.createServer(async (request, response) => {
 			}
 
 			// Toggle the email preference
-			user.emailOptIn = !user.emailOptIn;
-
-			await writeUsers(users);
+			const updatedUser = await userRepository.update(user.id, {
+				emailOptIn: !user.emailOptIn
+			});
 
 			// Keep the session's user information synchronized
-			loggedInUser.emailOptIn = user.emailOptIn;
+			loggedInUser.emailOptIn = updatedUser.emailOptIn;
 
 			sendJson(response, 200, {
 				message: 'Email preference updated.',
-				emailOptIn: user.emailOptIn
+				emailOptIn: updatedUser.emailOptIn
 			});
 
 		} catch (error) {
@@ -586,18 +567,25 @@ const server = http.createServer(async (request, response) => {
 				return;
 			}
 
-			const users = await readUsers();
-			const duplicateEmail = users.find((user) => user.email === email);
+			const existingUser = await userRepository.findByEmail(email);
 
-			if (duplicateEmail) {
+			if (existingUser) {
 				sendJson(response, 409, {
 					error: 'An account with that email already exists.'
 				});
 				return;
 			}
 
+			const passwordHash = await hashPassword(password);
 
-			const user = await createUser({ name, email, password, rating, role, emailOptIn });
+			const user = await userRepository.create({
+				name,
+				email,
+				passwordHash,
+				rating,
+				role,
+				emailOptIn
+			});
 
 			sendJson(response, 201, {
 				message: 'Account created successfully.',
@@ -623,10 +611,21 @@ const server = http.createServer(async (request, response) => {
 				});
 				return;
 			}
-			const users = await readUsers();
-			const user = users.find((entry) => entry.email === email && entry.password === password);
+			const user = await userRepository.findByEmail(email);
 
-			if (!user) {
+			if (!user || !user.passwordHash) {
+				sendJson(response, 401, {
+					error: 'Invalid email or password.'
+				});
+				return;
+			}
+
+			const passwordMatches = await verifyPassword(
+				password,
+				user.passwordHash
+			);
+
+			if (!passwordMatches) {
 				sendJson(response, 401, {
 					error: 'Invalid email or password.'
 				});
@@ -726,54 +725,20 @@ const server = http.createServer(async (request, response) => {
 				return;
 			}
 
-			const lists = await readLists();
-
-			const registeredUsers = lists['registered-users'] || [];
-			const waitlistUsers = lists['waitlist-users'] || [];
-
-			const email = loggedInUser.email.trim().toLowerCase();
-
-			const registeredIndex = registeredUsers.findIndex(
-				(player) => player.email.trim().toLowerCase() === email
+			const withdrawn = await registrationService.withdrawUser(
+				loggedInUser.id
 			);
 
-			const waitlistIndex = waitlistUsers.findIndex(
-				(player) => player.email.trim().toLowerCase() === email
-			);
-
-			// User is a registered player
-			if (registeredIndex !== -1) {
-				// Remove them from registered users
-				registeredUsers.splice(registeredIndex, 1);
-
-				// Promote the first waitlisted player
-				if (waitlistUsers.length > 0) {
-					const promotedPlayer = waitlistUsers.shift();
-
-					registeredUsers.push(promotedPlayer);
-				}
-			}
-
-			// User is a waitlisted player
-			else if (waitlistIndex !== -1) {
-				waitlistUsers.splice(waitlistIndex, 1);
-			}
-
-			// User is not in either list
-			else {
+			if (!withdrawn) {
 				sendJson(response, 404, {
 					error: 'You are not registered or waitlisted.'
 				});
 				return;
 			}
 
-			await writeLists(lists);
-
 			sendJson(response, 200, {
 				message: 'Successfully withdrawn.'
 			});
-
-			return;
 
 		} catch (error) {
 			console.error('Withdrawal error:', error);
@@ -781,9 +746,9 @@ const server = http.createServer(async (request, response) => {
 			sendJson(response, 500, {
 				error: 'Unable to process withdrawal.'
 			});
-
-			return;
 		}
+
+		return;
 	}
 	
 	if (
@@ -812,30 +777,19 @@ const server = http.createServer(async (request, response) => {
 			return;
 		}
 
-		const lists = await readLists();
+		const registeredUsers =
+			await registrationRepository.findRegistered();
 
-		const registeredUsers = lists['registered-users'] || [];
-		const waitlistUsers = lists['waitlist-users'] || [];
+		const waitlistUsers =
+			await registrationRepository.findWaitlisted();
 
 		const isRegistered =
 			registeredUsers.some(
-				(entry) =>
-					entry.email.trim().toLowerCase() ===
-					loggedInUser.email.trim().toLowerCase()
+				(entry) => String(entry.id) === String(loggedInUser.id)
 			) ||
 			waitlistUsers.some(
-				(entry) =>
-					entry.email.trim().toLowerCase() ===
-					loggedInUser.email.trim().toLowerCase()
+				(entry) => String(entry.id) === String(loggedInUser.id)
 			);
-		// console.log('loggedInUser email:', loggedInUser.email);
-		// console.log('Registered users:', registeredUsers.map(u => u.email));
-		// console.log('Is registered or waitlisted:', isRegistered);
-		// console.log('Email user:', process.env.EMAIL_USER);
-		// console.log(
-		// 	'Email password loaded:',
-		// 	Boolean(process.env.EMAIL_PASSWORD)
-		// );
 		sendJson(response, 200, {
 			isRegistered
 		});
@@ -848,16 +802,41 @@ const server = http.createServer(async (request, response) => {
 	});
 });
 
-
-
-const {
-	runSaturdayAutomation
-} = require('./satAutomation');
-
 // * * * * * for testing every minute
-// 0 9 * * 6 for every Saturday at 9:00 AM
 cron.schedule('0 9 * * 6', async () => {
-    await runSaturdayAutomation();
+	console.log('Running Saturday volleyball automation...');
+
+	try {
+		const users = await userRepository.findAll();
+
+		// Clear registered and waitlisted players in PostgreSQL.
+		await clearPlayerLists();
+
+		// Reset the full-registration email flag in PostgreSQL.
+		await emailMetadataRepository.set(
+			'registration-full-email-sent',
+			false
+		);
+
+		const emailInfo = await sendEmailToOptedInUsers(
+			users,
+			registrationOpenEmail
+		);
+
+		console.log(
+			'Registration email Message-ID:',
+			emailInfo?.messageId
+		);
+
+		if (emailInfo?.messageId) {
+			await saveRegistrationMessageId(emailInfo.messageId);
+		}
+
+		console.log('Saturday volleyball automation completed.');
+
+	} catch (error) {
+		console.error('Saturday automation failed:', error);
+	}
 }, {
     timezone: 'America/New_York'
 });
@@ -867,11 +846,13 @@ cron.schedule('0 16 * * 1', async () => {
 	console.log('Running Monday volleyball automation...');
 
 	try {
-		const users = await readUsers();
-		const lists = await readLists();
-		const registeredUsers = lists['registered-users'];
+		const users = await userRepository.findAll();
 
-		if (registeredUsers && registeredUsers.length < 8) {
+		// Retrieve registered players from PostgreSQL.
+		const registeredUsers =
+			await registrationRepository.findRegistered();
+
+		if (registeredUsers.length < 10) {
 			await sendEmailToOptedInUsers(
 				users,
 				volleyballCanceledEmail
@@ -879,6 +860,7 @@ cron.schedule('0 16 * * 1', async () => {
 		}
 
 		console.log('Monday volleyball automation completed.');
+
 	} catch (error) {
 		console.error('Monday automation failed:', error);
 	}

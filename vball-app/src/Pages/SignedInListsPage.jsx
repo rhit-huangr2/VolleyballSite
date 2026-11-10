@@ -11,7 +11,8 @@ function SignedInListsPage({
 	onSignOut,
     isRegistered,
     checkRegistration,
-    setIsRegistered
+    setIsRegistered,
+    onRefreshLists
 }) {
 
     const [showGuestModal, setShowGuestModal] = useState(false);
@@ -37,34 +38,25 @@ function SignedInListsPage({
 
     async function handleRegister(event) {
         event.preventDefault();
-        console.log('handleRegister called with signedInUser:', signedInUser); // Debugging log
-        // console.log('Is Registered:', isRegistered); // Debugging log
+
         try {
             const response = await fetch('/api/lists', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "name": signedInUser.name,
-                    "email": signedInUser.email,
-                    "password": signedInUser.password,
-                    "rating": signedInUser.rating
-                })
+                }
             });
 
             const result = await response.json();
 
             if (response.ok) {
-                window.location.reload(); // Refresh the page to show updated lists
-            }
-            else {
+                window.location.reload();
+            } else {
                 alert('Error registering player: ' + (result.error || 'Unknown error'));
             }
         } catch (error) {
-            // setStatus(error.message);
-        } finally {
-            // setIsSubmitting(false);
+            console.error('Registration error:', error);
+            alert('Unable to register. Please try again.');
         }
     }
 
@@ -135,8 +127,7 @@ function SignedInListsPage({
                     <ul className="player-list">
 
                         {players.map((player) => {
-                            const isGuest = player.guestOf !== undefined;
-
+                            const isGuest = player.isGuest === true;
                             return (
                                 <li
                                     key={player.email}
@@ -234,13 +225,23 @@ function SignedInListsPage({
             <div className="dashboard-info">
                 <p>CEMC Volleyball runs from 7:30 to 10:00 PM. Once 24 registered players are reached, newly registered players go to the wait list.</p>
                 {signedInUser?.role === 'admin' && (
+
                     <button
                         type="button"
                         className="register-button view-toggle-button active"
-                        onClick={() => setShowEditListsModal(true)}
+                        onClick={async () => {
+                            try {
+                                await onRefreshLists();
+                                setShowEditListsModal(true);
+                            } catch (error) {
+                                console.error('Failed to load PostgreSQL lists:', error);
+                                alert('Unable to load PostgreSQL lists.');
+                            }
+                        }}
                     >
                         Edit Lists
                     </button>
+                    
                 )}
                 {showEditListsModal && (
                     <EditListsModal

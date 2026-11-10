@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/rhit-huangr2/VolleyballSite#readme",
   "dependencies": {
-    "nodemailer": "^9.0.5"
+    "nodemailer": "^9.0.5",
+    "pg": "^8.23.1"
   }
 }
