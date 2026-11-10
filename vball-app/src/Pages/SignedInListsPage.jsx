@@ -12,7 +12,7 @@ function SignedInListsPage({
     isRegistered,
     checkRegistration,
     setIsRegistered,
-    onRefreshPostgresLists
+    onRefreshLists
 }) {
 
     const [showGuestModal, setShowGuestModal] = useState(false);
@@ -231,7 +231,7 @@ function SignedInListsPage({
                         className="register-button view-toggle-button active"
                         onClick={async () => {
                             try {
-                                await onRefreshPostgresLists();
+                                await onRefreshLists();
                                 setShowEditListsModal(true);
                             } catch (error) {
                                 console.error('Failed to load PostgreSQL lists:', error);

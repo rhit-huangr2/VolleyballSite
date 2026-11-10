@@ -219,7 +219,7 @@ function EditListsModal({ playerLists, onClose }) {
 
             setSaving(true);
 
-            const response = await fetch('/api/admin/lists-db-test', {                method: 'PUT',
+            const response = await fetch('/api/admin/lists', {                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },

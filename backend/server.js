@@ -3,18 +3,6 @@ require('dotenv').config();
 const http = require('http');
 const crypto = require('crypto');
 const cron = require('node-cron');
-const {
-	readUsers,
-	writeUsers,
-	readLists,
-	writeLists,
-	createListEntry,
-	createUser,
-	updateUser,
-	deleteUser,
-	updateListEntry,
-	deleteListEntry
-} = require('./data/jsonCrud');
 
 const { 
 	listService, 
@@ -67,12 +55,6 @@ function getCookie(request, name) {
 	return cookie
 		? decodeURIComponent(cookie.split('=')[1])
 		: null;
-}
-
-async function clearPlayerLists() {
-	await registrationRepository.clearAll();
-
-	console.log('Weekly player lists cleared.');
 }
 
 async function clearPlayerLists() {
@@ -331,25 +313,6 @@ const server = http.createServer(async (request, response) => {
 		return;
 	}
 
-	if (
-		request.url === '/api/lists-db-test' &&
-		request.method === 'GET'
-	) {
-		try {
-			const lists = await listService.getLists();
-
-			sendJson(response, 200, lists);
-		} catch (error) {
-			console.error('PostgreSQL list test failed:', error);
-
-			sendJson(response, 500, {
-				error: 'Unable to load PostgreSQL player lists.'
-			});
-		}
-
-		return;
-	}
-
 	if (request.url === '/api/lists' && request.method === 'GET') {
 		try {
 			const lists = await listService.getLists();
@@ -410,37 +373,6 @@ const server = http.createServer(async (request, response) => {
 	}
 
 	if (request.url === '/api/admin/lists' && request.method === 'PUT') {
-		const sessionId = getSessionId(request);
-		const loggedInUser = sessions.get(sessionId);
-
-		if (!loggedInUser || loggedInUser.role !== 'admin') {
-			sendJson(response, 403, { error: 'Unauthorized' });
-			return;
-		}
-
-		try {
-			const body = await readRequestBody(request);
-			const { registeredUsers, waitlistUsers } = body;
-
-			await registrationRepository.replaceAllLists(
-				registeredUsers,
-				waitlistUsers
-			);
-
-			sendJson(response, 200, { message: 'Lists updated successfully.' });
-		} catch (error) {
-			console.error('Failed to update PostgreSQL player lists:', error);
-
-			sendJson(response, 500, {
-				error: 'Unable to update player lists.'
-			});
-		}
-
-		return;
-	}
-
-
-	if (request.url === '/api/admin/lists-db-test' && request.method === 'PUT') {
 		try {
 			const sessionId = getCookie(request, 'sessionId');
 

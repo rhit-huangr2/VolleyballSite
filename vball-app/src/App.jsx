@@ -53,18 +53,9 @@ function App() {
 
 
 
-  async function refreshPlayerLists(usePostgres = false) {
-    const endpoint = usePostgres
-      ? '/api/lists-db-test'
-      : '/api/lists';
-
-    const response = await fetch(endpoint);
+  async function refreshPlayerLists() {
+    const response = await fetch('/api/lists');
     const result = await response.json();
-
-    // console.log('Endpoint:', endpoint);
-    // console.log('API response:', result);
-    // console.log('Registered users:', result['registered-users']);
-    // console.log('Waitlisted users:', result['waitlist-users']);
 
     if (!response.ok) {
       throw new Error(result.error || 'Unable to load player lists.');
@@ -243,11 +234,11 @@ function App() {
       <>
         <h1 className="eyebrow">CEMC Volleyball</h1>
 
-        <button
+        {/* <button
           type="button"
           onClick={async () => {
             try {
-              await refreshPlayerLists(true);
+              await refreshPlayerLists();
               alert('PostgreSQL lists loaded successfully.');
             } catch (error) {
               console.error('PostgreSQL list test failed:', error);
@@ -256,7 +247,7 @@ function App() {
           }}
         >
           Test PostgreSQL Lists
-        </button>
+        </button> */}
 
       </>
     );
@@ -310,7 +301,7 @@ function App() {
           isRegistered={isRegistered}
           checkRegistration={checkRegistration}
           setIsRegistered={setIsRegistered}
-          onRefreshPostgresLists={() => refreshPlayerLists(true)}
+          onRefreshLists={refreshPlayerLists}
         />
         
       );
