@@ -25,7 +25,7 @@ class PostgresRegistrationRepository extends RegistrationRepository {
                 g.name AS guest_name,
                 g.email AS guest_email,
                 g.rating AS guest_rating,
-                host.name AS guest_of
+                host.id AS guest_of
     
              FROM registrations r
     

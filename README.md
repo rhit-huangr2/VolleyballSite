@@ -1,4 +1,6 @@
 # IDEAS TO ADD
+- Modify guest information
+- Delete Users
 - EMAILS
     - Registration confirmation ???
     - Autobalanced teams ???

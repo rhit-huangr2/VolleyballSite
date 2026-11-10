@@ -16,9 +16,6 @@ class PostgresUserRepository extends UserRepository {
             rating: row.rating,
             role: row.role,
             emailOptIn: row.email_opt_in,
-            isGuest: row.is_guest,
-            guestOf: row.guest_of_email,
-            experienceLevel: row.experience_level
         };
     }
 
@@ -55,10 +52,9 @@ class PostgresUserRepository extends UserRepository {
         const result = await pool.query(
             `INSERT INTO users (
                 name, email, password_hash, rating, role,
-                email_opt_in, is_guest, guest_of_email,
-                experience_level
+                email_opt_in
             )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+            VALUES ($1, $2, $3, $4, $5, $6)
             RETURNING *`,
             [
                 user.name,
@@ -67,9 +63,6 @@ class PostgresUserRepository extends UserRepository {
                 user.rating ?? null,
                 user.role ?? (user.isGuest ? null : 'member'),
                 user.emailOptIn ?? null,
-                user.isGuest ?? false,
-                user.guestOf ?? null,
-                user.experienceLevel ?? null
             ]
         );
 
@@ -84,9 +77,6 @@ class PostgresUserRepository extends UserRepository {
             rating: 'rating',
             role: 'role',
             emailOptIn: 'email_opt_in',
-            isGuest: 'is_guest',
-            guestOf: 'guest_of_email',
-            experienceLevel: 'experience_level'
         };
 
         const entries = Object.entries(changes).filter(
