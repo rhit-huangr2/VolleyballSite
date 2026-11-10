@@ -2,15 +2,9 @@
 - EMAILS
     - Registration confirmation ???
     - Autobalanced teams ???
-
-- Admin should be able to manually change lists (complete)
-    - fix CSS
-- guests
-    - fix CSS
 - Basketball signups
 - rating system
 - Matt's Suggestions
-    - might be good to add a database
     - refresh the lists (not the whole page)
     - player metrics (track how many times a user has attended)
 
